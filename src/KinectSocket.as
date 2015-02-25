@@ -92,7 +92,7 @@ package
 			var f4:ByteArray = new ByteArray();
 			f4.writeBytes(_data, _data.length - 4, 4);
 			
-			if (f4[0] == f4[1] == f4[2] == f4[3] == 0) {
+			if ((f4[0] == 0) && (f4[1] == 0) && (f4[2] == 0) && (f4[3] == 0)) {
 				trace("0000");
 				_data.position = 0;
 				_data.writeBytes(_data, 4, _data.length - 4);
