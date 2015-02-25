@@ -67,7 +67,7 @@ package
 					colorFeed.bytes = kinectSocket.data;
 					break;
 				case KinectSocket.GET_BODY_COMMAND:
-					kinectSocket.callGetBodyCommand();
+					bodyFeed.bytes = kinectSocket.data;
 					break;
 				case KinectSocket.GET_BODY_DATA_COMMAND:					
 					break;
