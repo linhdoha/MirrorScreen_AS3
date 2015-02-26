@@ -54,6 +54,9 @@ package
 
 		private function connectHandler(event:Event):void {
 			trace("connectHandler: " + event);
+			_kinectFrame.colorImageFlag = true;
+			_kinectFrame.bodyIndexImageFlag = false;
+			_kinectFrame.bodyDataFlag = true;
 			_kinectFrame.start();
 		}
 
