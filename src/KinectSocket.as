@@ -54,7 +54,7 @@ package
 
 		private function connectHandler(event:Event):void {
 			trace("connectHandler: " + event);
-			_kinectFrame.colorImageFlag = true;
+			_kinectFrame.colorImageFlag = false;
 			_kinectFrame.bodyIndexImageFlag = false;
 			_kinectFrame.bodyDataFlag = true;
 			_kinectFrame.start();
@@ -108,16 +108,16 @@ package
 				
 				switch (_currentReadingData) {
 					case COLOR_IMAGE_SIGN:
-						_kinectFrame.colorImage = _data;
 						_kinectFrame.colorImageReceived = true;
+						_kinectFrame.colorImage = _data;
 						break;
 					case BODY_INDEX_IMAGE_SIGN:
-						_kinectFrame.bodyIndexImage = _data;
 						_kinectFrame.bodyIndexImageReceived = true;
+						_kinectFrame.bodyIndexImage = _data;
 						break;
 					case BODY_DATA_SIGN:
-						_kinectFrame.bodyData = _data;
 						_kinectFrame.bodyDataReceived = true;
+						_kinectFrame.bodyData = _data;
 						break;
 				}
 			} else {

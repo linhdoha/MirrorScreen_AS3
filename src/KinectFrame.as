@@ -75,7 +75,6 @@ package
 		public function set colorImageReceived(value:Boolean):void 
 		{
 			_colorImageReceived = value;
-			checkFrameDataReceivedComplete();
 		}
 		
 		public function get bodyIndexImageReceived():Boolean 
@@ -86,7 +85,6 @@ package
 		public function set bodyIndexImageReceived(value:Boolean):void 
 		{
 			_bodyIndexImageReceived = value;
-			checkFrameDataReceivedComplete();
 		}
 		
 		public function get bodyDataReceived():Boolean 
@@ -97,7 +95,6 @@ package
 		public function set bodyDataReceived(value:Boolean):void 
 		{
 			_bodyDataReceived = value;
-			checkFrameDataReceivedComplete();
 		}
 		
 		public function get colorImage():ByteArray 
@@ -108,6 +105,7 @@ package
 		public function set colorImage(value:ByteArray):void 
 		{
 			_colorImage = value;
+			checkFrameDataReceivedComplete();
 		}
 		
 		public function get bodyIndexImage():ByteArray 
@@ -118,6 +116,7 @@ package
 		public function set bodyIndexImage(value:ByteArray):void 
 		{
 			_bodyIndexImage = value;
+			checkFrameDataReceivedComplete();
 		}
 		
 		public function get bodyData():ByteArray 
@@ -128,6 +127,7 @@ package
 		public function set bodyData(value:ByteArray):void 
 		{
 			_bodyData = value;
+			checkFrameDataReceivedComplete();
 		}
 		
 		private function checkFrameDataReceivedComplete():void {
