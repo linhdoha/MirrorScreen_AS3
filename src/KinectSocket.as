@@ -68,8 +68,8 @@ package
 			var dataTemp:ByteArray = new ByteArray();
 			readBytes(dataTemp, 0, bytesAvailable);
 			
-			if (!isReading) {
-				var headerSign:String = dataTemp.readUTFBytes(4);
+			//read 4 begin bytes
+			var headerSign:String = dataTemp.readUTFBytes(4);
 				switch(headerSign) {
 					case GET_COLOR_COMMAND:
 					case GET_BODY_COMMAND:
@@ -80,18 +80,18 @@ package
 						_data = new ByteArray();
 						break;
 					default:
-						trace("Malfuntion command!");
-						return;
+						if (!isReading) {
+							trace("Malfuntion command!");
+							return;
+						}
 						break;
 				}
-				
-			}
 			
 			_data.writeBytes(dataTemp, 0, dataTemp.length);
 			
+			//check 4 end bytes
 			var f4:ByteArray = new ByteArray();
 			f4.writeBytes(_data, _data.length - 4, 4);
-			
 			if ((f4[0] == 0) && (f4[1] == 0) && (f4[2] == 0) && (f4[3] == 0)) {
 				trace("0000");
 				_data.position = 0;
@@ -100,29 +100,10 @@ package
 				trace(_data.length);
 				isReading = false;
 				
-				//_data.position = 0;
-				//trace(_data.readUTFBytes(8));
-				
 				dispatchEvent(new Event(GET_DATA_COMPLETE));
 			} else {
 				return;
 			}
-			
-			
-			/*if (_data[_data.length - 1] == 0) {
-				_data.position = 0;
-				_data.writeBytes(_data, 4, _data.length - 4);
-				_data.length = _data.length - 4;
-				trace(_data.length);
-				isReading = false;
-				
-				//_data.position = 0;
-				//trace(_data.readUTFBytes(8));
-				
-				dispatchEvent(new Event(GET_DATA_COMPLETE));
-			} else {
-				return;
-			}*/
 		}
 		
 		private function initReveiveBytes():void {
