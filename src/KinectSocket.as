@@ -13,20 +13,15 @@ package
 	 */
 	public class KinectSocket extends Socket 
 	{
-		public static const GET_DATA_COMPLETE:String = "getDataComplete";
-		public static const IS_READY:String = "isReady";
-		public static const GET_COLOR_COMMAND:String = "+CLR";
-		public static const GET_BODY_COMMAND:String = "+BDY";
-		public static const GET_BODY_DATA_COMMAND:String = "+BDD";
+		public static const COLOR_IMAGE_SIGN:String = "+CLR";
+		public static const BODY_INDEX_IMAGE_SIGN:String = "+BDY";
+		public static const BODY_DATA_SIGN:String = "+BDD";
 		
 		private	var _data:ByteArray = new ByteArray();
-		private	var dataLength:ByteArray = new ByteArray();
-		private	var dataPosition:int = new int();		
-		private var dataLengthFlag:Boolean = new Boolean();
-		private var dataLengthCounter:int = new int();
-		private var dataPreviousPosition:int = new int();
 		private var isReading:Boolean = false;
-		private var _currentReadingCommand:String;
+		private var _currentReadingData:String;
+		private var _kinectFrame:KinectFrame;
+		
 		
 		public function KinectSocket(host:String=null, port:int=0) 
 		{
@@ -35,6 +30,14 @@ package
 			if (host && port)  {
 				super.connect(host, port);
 			}
+			
+			_kinectFrame = new KinectFrame();
+			_kinectFrame.addEventListener(KinectFrame.START_LOAD_FRAME, onStartLoadFrame);
+		}
+		
+		private function onStartLoadFrame(e:Event):void 
+		{
+			callRequestDataCommand();
 		}
 		
 		private function configureListeners():void {
@@ -51,7 +54,7 @@ package
 
 		private function connectHandler(event:Event):void {
 			trace("connectHandler: " + event);
-			dispatchEvent(new Event(IS_READY));
+			_kinectFrame.start();
 		}
 
 		private function ioErrorHandler(event:IOErrorEvent):void {
@@ -70,22 +73,22 @@ package
 			
 			//read 4 begin bytes
 			var headerSign:String = dataTemp.readUTFBytes(4);
-				switch(headerSign) {
-					case GET_COLOR_COMMAND:
-					case GET_BODY_COMMAND:
-					case GET_BODY_DATA_COMMAND:
-						trace("headerSign: "+headerSign);
-						isReading = true;
-						_currentReadingCommand = headerSign;
-						_data = new ByteArray();
-						break;
-					default:
-						if (!isReading) {
-							trace("Malfuntion command!");
-							return;
-						}
-						break;
-				}
+			switch(headerSign) {
+				case COLOR_IMAGE_SIGN:
+				case BODY_INDEX_IMAGE_SIGN:
+				case BODY_DATA_SIGN:
+					trace("headerSign: "+headerSign);
+					isReading = true;
+					_currentReadingData = headerSign;
+					_data = new ByteArray();
+					break;
+				default:
+					if (!isReading) {
+						trace("Malfuntion data!");
+						return;
+					}
+					break;
+			}
 			
 			_data.writeBytes(dataTemp, 0, dataTemp.length);
 			
@@ -100,64 +103,53 @@ package
 				trace(_data.length);
 				isReading = false;
 				
-				dispatchEvent(new Event(GET_DATA_COMPLETE));
+				switch (_currentReadingData) {
+					case COLOR_IMAGE_SIGN:
+						_kinectFrame.colorImage = _data;
+						_kinectFrame.colorImageReceived = true;
+						break;
+					case BODY_INDEX_IMAGE_SIGN:
+						_kinectFrame.bodyIndexImage = _data;
+						_kinectFrame.bodyIndexImageReceived = true;
+						break;
+					case BODY_DATA_SIGN:
+						_kinectFrame.bodyData = _data;
+						_kinectFrame.bodyDataReceived = true;
+						break;
+				}
 			} else {
 				return;
 			}
 		}
 		
-		private function initReveiveBytes():void {
-			_data = new ByteArray();
-			dataLength =  new ByteArray();
-			dataLengthFlag = false;
-			dataPosition = new int();					
-			dataLengthCounter = new int();
-			dataPreviousPosition = new int();	
-		}
-		
-		private function swap32(val:int):int {
-			return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val >> 8) & 0xFF00) | ((val >> 24) & 0xFF);
-		}
-		
-		public function callGetColorCommand():void 
-		{
+		private function callRequestDataCommand():void {
 			if (connected) {
-				initReveiveBytes();
-				writeUTFBytes("GETCOLOR\0");
-				flush();
-			} else {
-				trace("Socket's not connected.");
+				if (_kinectFrame.colorImageFlag || _kinectFrame.bodyIndexImageFlag || _kinectFrame.bodyDataFlag) {
+					var object:Object = {
+						"command":"requestData",
+						"dataReceive":{
+							"colorImage":_kinectFrame.colorImageFlag,
+							"bodyIndexImage":_kinectFrame.bodyIndexImageFlag,
+							"bodyData":_kinectFrame.bodyDataFlag
+						}
+					};
+					
+					writeUTFBytes(JSON.stringify(object));
+					flush();
+				}
+				
+				
 			}
 		}
 		
-		public function callGetBodyCommand():void {
-			if (connected) {
-				initReveiveBytes();
-				writeUTFBytes("GETBODY\0");
-				flush();
-			} else {
-				trace("Socket's not connected.");
-			}
-		}
-		
-		public function callGetBodyDataCommand():void {
-			if (connected) {
-				initReveiveBytes();
-				writeUTFBytes("GETBODYDATA\0");
-				flush();
-			} else {
-				trace("Socket's not connected.");
-			}
-		}
-		
-		public function get data():ByteArray 
+		public function get currentReadingData():String 
 		{
-			return _data;
+			return _currentReadingData;
 		}
 		
-		public function get currentReadingCommand():String 
+		public function get kinectFrame():KinectFrame 
 		{
-			return _currentReadingCommand;
+			return _kinectFrame;
 		}
 	}
 

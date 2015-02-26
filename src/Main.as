@@ -21,11 +21,9 @@ package
 	 * @author Linhdoha
 	 */
 	public class Main extends Sprite {	
-		private var debugTxt:TextField;
 		private var kinectSocket:KinectSocket;
 		private var colorFeed:LiveVideoFeed;
 		private var bodyFeed:LiveVideoFeed;
-		
 		
 		public function Main() 
 		{
@@ -39,56 +37,27 @@ package
 			// entry point
 			
 			kinectSocket = new KinectSocket("localhost", 7001);
-			kinectSocket.addEventListener(KinectSocket.IS_READY, onKinectSocketReady);
-			kinectSocket.addEventListener(KinectSocket.GET_DATA_COMPLETE, onKinectSocketGetDataComplete);
+			kinectSocket.kinectFrame.addEventListener(KinectFrame.LOAD_FRAME_COMPLETE, onLoadFrameComplete);
 			
 			colorFeed = new LiveVideoFeed();
-			colorFeed.addEventListener(LiveVideoFeed.BYTES_LOAD_COMPLETED, onColorFeedLoadComplete);
 			addChild(colorFeed);
 			
 			bodyFeed = new LiveVideoFeed();
-			bodyFeed.addEventListener(LiveVideoFeed.BYTES_LOAD_COMPLETED, onBodyFeedLoadComplete);
-			
-			debugTxt = new TextField();
-			//addChild(debugTxt);
-			
-			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+			addChild(bodyFeed);
+			bodyFeed.x = 300;
+			bodyFeed.y = 100;
 		}
 		
-		private function onMouseDown(e:MouseEvent):void 
+		private function onLoadFrameComplete(e:Event):void 
 		{
-			kinectSocket.callGetBodyDataCommand();
-		}
-		
-		private function onKinectSocketGetDataComplete(e:Event):void 
-		{
-			switch(kinectSocket.currentReadingCommand) {
-				case KinectSocket.GET_COLOR_COMMAND:
-					colorFeed.bytes = kinectSocket.data;
-					break;
-				case KinectSocket.GET_BODY_COMMAND:
-					bodyFeed.bytes = kinectSocket.data;
-					break;
-				case KinectSocket.GET_BODY_DATA_COMMAND:					
-					kinectSocket.data.position = 0;
-					trace(kinectSocket.data.readUTFBytes(kinectSocket.data.bytesAvailable));
-					break;
+			if (kinectSocket.kinectFrame.colorImageFlag) colorFeed.bytes = kinectSocket.kinectFrame.colorImage;
+			
+			if (kinectSocket.kinectFrame.bodyIndexImageFlag) bodyFeed.bytes = kinectSocket.kinectFrame.bodyIndexImage;
+			
+			if (kinectSocket.kinectFrame.bodyDataFlag) {
+				kinectSocket.kinectFrame.bodyData.position = 0;
+				trace(kinectSocket.kinectFrame.bodyData.readUTFBytes(kinectSocket.kinectFrame.bodyData.bytesAvailable));
 			}
-		}
-		
-		private function onKinectSocketReady(e:Event):void 
-		{
-			kinectSocket.callGetColorCommand();
-		}
-		
-		private function onBodyFeedLoadComplete(e:Event):void 
-		{
-			kinectSocket.callGetBodyCommand();
-		}
-		
-		private function onColorFeedLoadComplete(e:Event):void 
-		{
-			kinectSocket.callGetColorCommand();
 		}
 	}
 	
