@@ -57,7 +57,7 @@ package
 		
 		private function onMouseDown(e:MouseEvent):void 
 		{
-			kinectSocket.callGetColorCommand();
+			kinectSocket.callGetBodyDataCommand();
 		}
 		
 		private function onKinectSocketGetDataComplete(e:Event):void 
@@ -70,6 +70,7 @@ package
 					bodyFeed.bytes = kinectSocket.data;
 					break;
 				case KinectSocket.GET_BODY_DATA_COMMAND:					
+					trace(kinectSocket.data.readUTF());
 					break;
 			}
 		}
