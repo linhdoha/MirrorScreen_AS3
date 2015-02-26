@@ -70,7 +70,8 @@ package
 					bodyFeed.bytes = kinectSocket.data;
 					break;
 				case KinectSocket.GET_BODY_DATA_COMMAND:					
-					trace(kinectSocket.data.readUTF());
+					kinectSocket.data.position = 0;
+					trace(kinectSocket.data.readUTFBytes(kinectSocket.data.bytesAvailable));
 					break;
 			}
 		}
