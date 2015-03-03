@@ -53,7 +53,7 @@ package
 		}
 
 		private function connectHandler(event:Event):void {
-			trace("connectHandler: " + event);
+			//trace("connectHandler: " + event);
 			_kinectFrame.colorImageFlag = false;
 			_kinectFrame.bodyIndexImageFlag = false;
 			_kinectFrame.bodyDataFlag = true;
@@ -69,7 +69,7 @@ package
 		}
 
 		private function socketDataHandler(event:ProgressEvent):void {
-			trace("socketDataHandler: " + event);
+			//trace("socketDataHandler: " + event);
 			
 			var dataTemp:ByteArray = new ByteArray();
 			readBytes(dataTemp, 0, bytesAvailable);
@@ -80,7 +80,6 @@ package
 				case COLOR_IMAGE_SIGN:
 				case BODY_INDEX_IMAGE_SIGN:
 				case BODY_DATA_SIGN:
-					trace("headerSign: "+headerSign);
 					isReading = true;
 					_currentReadingData = headerSign;
 					_data = new ByteArray();
@@ -99,11 +98,10 @@ package
 			var f4:ByteArray = new ByteArray();
 			f4.writeBytes(_data, _data.length - 4, 4);
 			if ((f4[0] == 0) && (f4[1] == 0) && (f4[2] == 0) && (f4[3] == 0)) {
-				trace("0000");
 				_data.position = 0;
 				_data.writeBytes(_data, 4, _data.length - 4);
 				_data.length = _data.length - 4;
-				trace(_data.length);
+				
 				isReading = false;
 				
 				switch (_currentReadingData) {
@@ -139,6 +137,7 @@ package
 					
 					writeUTFBytes(JSON.stringify(object));
 					flush();
+					trace("callRequestDataCommand: "+ JSON.stringify(object));
 				}
 				
 				
