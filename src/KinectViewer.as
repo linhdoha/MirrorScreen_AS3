@@ -46,7 +46,7 @@ package
 					var foundSkeletonDisplayer:Boolean = false;
 					for (var j:int = 0; j < skeletonDisplayerList.length; j++) {
 						//nếu đã tồn tại thì cập nhật dữ liệu
-						if (bodyData.getTrackingIDAt(i) == skeletonDisplayerList[j].trackingID) {
+						if ((skeletonDisplayerList[j] != null) && (bodyData.getTrackingIDAt(i) == skeletonDisplayerList[j].trackingID)) {
 							skeletonDisplayerList[j].leftHandState = bodyData.getLeftHandStateAt(i);
 							skeletonDisplayerList[j].leftHandPos = bodyData.getLeftHandPosAt(i);
 							skeletonDisplayerList[j].leftHandDepth = bodyData.getLeftHandDepthAt(i);
@@ -80,11 +80,11 @@ package
 			for (var m:int = 0; m < skeletonDisplayerList.length; m++ ) {
 				var foundOnBodyData:Boolean = false;
 				for (var n:int = 0; n < bodyData.bodyCount; n++) {
-					if (skeletonDisplayerList[m].trackingID == bodyData.getTrackingIDAt(n)) {
+					if ((skeletonDisplayerList[m] !=null) && (skeletonDisplayerList[m].trackingID == bodyData.getTrackingIDAt(n))) {
 						foundOnBodyData = true;
 					}
 				}
-				if (!foundOnBodyData) {
+				if ((!foundOnBodyData) && (skeletonDisplayerList[m] !=null)) {
 					skeletonHolder.removeChild(skeletonDisplayerList[m]);
 					skeletonDisplayerList[m] = null;
 				}
