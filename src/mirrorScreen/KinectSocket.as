@@ -1,4 +1,4 @@
-package 
+package mirrorScreen 
 {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -137,7 +137,7 @@ package
 					
 					writeUTFBytes(JSON.stringify(object));
 					flush();
-					trace("callRequestDataCommand: "+ JSON.stringify(object));
+					//trace("callRequestDataCommand: "+ JSON.stringify(object));
 				}
 				
 				
