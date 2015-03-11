@@ -5,9 +5,9 @@ package mirrorScreen.displayComponents
 	import flash.filters.BlurFilter;
 	import flash.geom.Point;
 	import mirrorScreen.displayComponents.Hand;
-	import mirrorScreen.effects.BaseEffect;
-	import mirrorScreen.effects.FireEffect;
-	import mirrorScreen.utils.ColorStyle;
+	import com.nidlab.fx.BaseEffect;
+	import com.nidlab.fx.FireEffect;
+	import com.nidlab.utils.ColorStyle;
 	
 	/**
 	 * ...

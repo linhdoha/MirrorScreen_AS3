@@ -7,11 +7,10 @@ package mirrorScreen.displayComponents
 	 */
 	public class CountDown extends CountDownView 
 	{
-		
+		public static const COUNT_COMPLETED:String = "countCompleted";
 		public function CountDown() 
 		{
 			super();
-			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			reset();
 		}
 		
@@ -23,12 +22,15 @@ package mirrorScreen.displayComponents
 		public function start():void {
 			gotoAndPlay(1);
 			visible = true;
+			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
 		private function onEnterFrame(e:Event):void 
 		{
 			if (currentFrame == totalFrames) {
 				reset();
+				removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+				dispatchEvent(new Event(COUNT_COMPLETED));
 			}
 		}
 		
