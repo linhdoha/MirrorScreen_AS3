@@ -15,13 +15,15 @@ package mirrorScreen
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
 	import flash.media.Camera;
+	import flash.system.MessageChannel;
+	import flash.system.Worker;
+	import flash.system.WorkerDomain;
 	import flash.utils.ByteArray;
 	import mirrorScreen.data.Configuration;
 	import mirrorScreen.displayComponents.CountDown;
 	import mirrorScreen.displayComponents.SkeletonDisplayer;
-	import mirrorScreen.kinect.KinectFrame;
-	import mirrorScreen.kinect.KinectSocket;
 	import mirrorScreen.displayComponents.LiveVideoFeed;
+	import mirrorScreen.kinect.KinectSocket;
 	import mirrorScreen.kinect.KinectViewer;
 	
 	/**
@@ -30,13 +32,22 @@ package mirrorScreen
 	 */
 	public class Main extends Sprite
 	{
-		private var kinectSocket:KinectSocket;
-		private var bodyFeed:LiveVideoFeed;
+		private var kinectSocketCompact:KinectSocket;
+		
 		private var kinectViewer:KinectViewer;
+		
 		private var colorCamera:Camera;
 		private var bodyIndexCamera:Camera;
+		
 		private var countDown:CountDown;
 		private var configuration:Configuration;
+		private var saveImageWorker:Worker;
+		private var wtm:MessageChannel;
+		private var mtw:MessageChannel;
+		private var fileExtension:String;
+		private var bitmapData:BitmapData;
+		private var data:ByteArray;
+		private var imageBytes:ByteArray;
 		
 		public function Main()
 		{
@@ -69,20 +80,16 @@ package mirrorScreen
 				colorCamera.setMode(configuration.kinectCameraWidth, configuration.kinectCameraHeight, 30);
 				kinectViewer.attachColorImageSource(colorCamera);
 				kinectViewer.mirror = configuration.kinectCameraMirror;
-			} else {
-				kinectViewer.attachColorImageSource(kinectSocket);
 			}
 			
 			bodyIndexCamera = Camera.getCamera(configuration.kinectBodyIndexCameraID);
 			if (bodyIndexCamera != null) {
 				bodyIndexCamera.setMode(configuration.kinectBodyIndexCameraWidth, configuration.kinectBodyIndexCameraHeight, 30);
 				kinectViewer.attachBodyIndexImageSource(bodyIndexCamera);
-			} else {
-				kinectViewer.attachColorImageSource(kinectSocket);
 			}
 			
-			kinectSocket = new KinectSocket(configuration.kinectServerHost, configuration.kinectServerPort);
-			kinectSocket.kinectFrame.addEventListener(KinectFrame.LOAD_FRAME_COMPLETE, onLoadFrameComplete);
+			kinectSocketCompact = new KinectSocket(configuration.kinectServerHost, configuration.kinectServerPort);
+			kinectSocketCompact.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
 			
 			countDown = new CountDown();
 			countDown.addEventListener(CountDown.COUNT_COMPLETED, onCountCompleted);
@@ -92,6 +99,26 @@ package mirrorScreen
 			
 			var nativeProcess:NativeProcess;
 			trace(NativeProcess.isSupported);
+			
+			
+			//worker
+			data = new ByteArray();
+			data.shareable = true;
+			
+			imageBytes = new ByteArray();
+			imageBytes.shareable = true;
+			
+			saveImageWorker = WorkerDomain.current.createWorker(Workers.SaveImageWorker,true);
+			wtm = saveImageWorker.createMessageChannel(Worker.current);
+			mtw = Worker.current.createMessageChannel(saveImageWorker);
+			
+			wtm.addEventListener(Event.CHANNEL_MESSAGE, onMessageFromWorker);
+			
+			saveImageWorker.setSharedProperty("wtm",wtm);
+			saveImageWorker.setSharedProperty("mtw", mtw);
+			saveImageWorker.setSharedProperty("sourceImage", imageBytes);
+			saveImageWorker.setSharedProperty("data", data);
+			saveImageWorker.start();
 		}
 		
 		private function onDoubleClick(e:MouseEvent):void 
@@ -105,29 +132,36 @@ package mirrorScreen
 		
 		private function onCountCompleted(e:Event):void 
 		{
-			var bitmapData:BitmapData = new BitmapData(kinectViewer.width, kinectViewer.height, false);
+			bitmapData = new BitmapData(kinectViewer.width, kinectViewer.height, false);
 			bitmapData.draw(kinectViewer);
+			imageBytes.length = 0;
+			bitmapData.copyPixelsToByteArray(bitmapData.rect, imageBytes);
 			
-			var data:ByteArray;
-			var fileExtension:String;
 			if (configuration.imageFileType == "PNG") {
-				data = PNGEncoder.encode(bitmapData);
 				fileExtension = ".png";
 			} else {
-				var jpeg:JPGEncoder = new JPGEncoder(configuration.imageFileQuality);
-				data = jpeg.encode(bitmapData);
 				fileExtension = ".jpg";
 			}
 			
-			var fs:FileStream = new FileStream();
-			var targetFile:File = new File(configuration.storageDir);
-			if (!targetFile.exists) {
-				targetFile = File.desktopDirectory;
+			var commandObj:Object = {
+				command:"SAVE_IMAGE",
+				width:bitmapData.rect.width,
+				height:bitmapData.rect.height,
+				encode:configuration.imageFileType,
+				quality:configuration.imageFileQuality,
+				filename:configuration.prenameOfImage+String(new Date().time + fileExtension),
+				dir:configuration.storageDir
 			}
-			targetFile = targetFile.resolvePath(configuration.prenameOfImage+String(new Date().time + fileExtension));
-			fs.open(targetFile, FileMode.WRITE);
-			fs.writeBytes(data);
-			fs.close();
+			
+			mtw.send(commandObj);
+		}
+		
+		private function onMessageFromWorker(e:Event):void 
+		{
+			var messageReceived:* = wtm.receive();
+			if (messageReceived == "ENCODE_COMPLETED") {
+				trace("ENCODE_COMPLETED");
+			}
 		}
 		
 		private function onSnapCommandEvent(e:Event):void 
@@ -135,19 +169,9 @@ package mirrorScreen
 			countDown.start();
 		}
 		
-		private function onLoadFrameComplete(e:Event):void
-		{
-			//if (kinectSocket.kinectFrame.colorImageFlag)
-			//	colorFeed.bytes = kinectSocket.kinectFrame.colorImage;
-			
-			//if (kinectSocket.kinectFrame.bodyIndexImageFlag)
-			//	bodyFeed.bytes = kinectSocket.kinectFrame.bodyIndexImage;
-			
-			if (kinectSocket.kinectFrame.bodyDataFlag)
-			{
-				kinectSocket.kinectFrame.bodyData.position = 0;
-				kinectViewer.bodyData = kinectSocket.kinectFrame.bodyData.readUTFBytes(kinectSocket.kinectFrame.bodyData.bytesAvailable);
-			}
+		private function onBodyDataEvent(e:Event):void {
+			kinectSocketCompact.data.position = 0;
+			kinectViewer.bodyData = kinectSocketCompact.data.readUTFBytes(kinectSocketCompact.data.bytesAvailable);
 		}
 	}
 

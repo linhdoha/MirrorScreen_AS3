@@ -6,10 +6,9 @@ package mirrorScreen.kinect
 	import flash.media.Video;
 	import flash.utils.ByteArray;
 	import mirrorScreen.data.BodyData;
+	import mirrorScreen.data.NBodyData;
 	import mirrorScreen.displayComponents.LiveVideoFeed;
 	import mirrorScreen.displayComponents.SkeletonDisplayer;
-	import mirrorScreen.kinect.KinectSocket;
-	import mirrorScreen.kinect.KinectFrame;
 	
 	/**
 	 * ...
@@ -24,14 +23,14 @@ package mirrorScreen.kinect
 		
 		private var colorFeed:LiveVideoFeed;
 		
-		private var _bodyData:BodyData;
+		private var _bodyData:NBodyData;
 		
 		private var skeletonHolder:Sprite;
 		private var skeletonDisplayerList:Vector.<SkeletonDisplayer>;
 		
 		private var _mirror:Boolean = false;
-		private var _colorImageSource:Object;
-		private var _bodyIndexImageSource:Object;
+		private var _colorImageSource:Camera;
+		private var _bodyIndexImageSource:Camera;
 		
 		public function KinectViewer() 
 		{
@@ -40,7 +39,7 @@ package mirrorScreen.kinect
 			colorImageVideoHolder = new Sprite();
 			addChild(colorImageVideoHolder);
 			
-			_bodyData = new BodyData();
+			_bodyData = new NBodyData();
 			_bodyData.addEventListener(BodyData.DATA_CHANGED, onDataChanged);
 			
 			skeletonDisplayerList = new Vector.<SkeletonDisplayer>();
@@ -67,6 +66,7 @@ package mirrorScreen.kinect
 							skeletonDisplayerList[j].rightHand.state = _bodyData.getRightHandStateAt(i);
 							skeletonDisplayerList[j].rightHand.pos = _bodyData.getRightHandPosAt(i);
 							skeletonDisplayerList[j].rightHand.depth = _bodyData.getRightHandDepthAt(i);
+							
 							foundSkeletonDisplayer = true;
 						}
 					}
@@ -110,38 +110,22 @@ package mirrorScreen.kinect
 			dispatchEvent(new Event(SkeletonDisplayer.SNAP_COMMAND_EVENT));
 		}
 		
-		public function attachColorImageSource(source:Object):void {
+		public function attachColorImageSource(source:Camera):void {
 			_colorImageSource = source;
-			if (_colorImageSource is Camera) {
-				if (colorImageVideo != null) {
-					colorImageVideoHolder.removeChild(colorImageVideo);
-				}
-				var cameraSource:Camera = Camera(_colorImageSource);
-				colorImageVideo = new Video(cameraSource.width, cameraSource.height);
-				colorImageVideo.attachCamera(cameraSource);
-				colorImageVideoHolder.addChild(colorImageVideo);
-			} else if (_colorImageSource is KinectSocket) {
-				var colorImageKinectSocket:KinectSocket = KinectSocket(_colorImageSource);
-				colorImageKinectSocket.kinectFrame.addEventListener(KinectFrame.LOAD_FRAME_COMPLETE, onLoadFrameComplete);
-			} else {
-				trace("Source unknown!");
+			
+			if (colorImageVideo != null) {
+				colorImageVideoHolder.removeChild(colorImageVideo);
 			}
+			var cameraSource:Camera = Camera(_colorImageSource);
+			colorImageVideo = new Video(cameraSource.width, cameraSource.height);
+			colorImageVideo.attachCamera(cameraSource);
+			colorImageVideoHolder.addChild(colorImageVideo);
+			
 		}
 		
-		public function attachBodyIndexImageSource(source:Object):void {
+		public function attachBodyIndexImageSource(source:Camera):void {
 			_bodyIndexImageSource = source;
-			if (_bodyIndexImageSource is Camera) {
-				
-			} else if (_bodyIndexImageSource is KinectSocket) {
-				
-			} else {
-				trace("Source unknown!");
-			}
-		}
-		
-		private function onLoadFrameComplete(e:Event):void
-		{
-			if (KinectSocket(_colorImageSource).kinectFrame.colorImageFlag) colorFeed.bytes = KinectSocket(_colorImageSource).kinectFrame.colorImage;
+			
 		}
 		
 		public function set bodyData(s:String):void {

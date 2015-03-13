@@ -2,10 +2,10 @@
 <application xmlns="http://ns.adobe.com/air/application/15.0">
   <id>MirrorScreen</id>
   <versionNumber>1.0</versionNumber>
-  <filename>MirrorScreen</filename>
-  <name>MirrorScreen</name>
+  <filename>Mirror Screen</filename>
+  <name>Mirror Screen</name>
   <initialWindow>
-    <title>MirrorScreen</title>
+    <title>Digital Story 2015 - Mirror Screen</title>
     <content>MirrorScreen.swf</content>
     <systemChrome>standard</systemChrome>
     <transparent>false</transparent>
@@ -21,4 +21,16 @@
   <android>
     <manifestAdditions><![CDATA[<manifest android:installLocation="auto" xmlns:android="http://schemas.android.com/apk/res/android" />]]></manifestAdditions>
   </android>
+  <icon>
+    <image48x48>icons/MirrorScreen48.png</image48x48>
+    <image57x57>icons/MirrorScreen57.png</image57x57>
+    <image72x72>icons/MirrorScreen72.png</image72x72>
+    <image76x76>icons/MirrorScreen76.png</image76x76>
+    <image96x96>icons/MirrorScreen96.png</image96x96>
+    <image114x114>icons/MirrorScreen114.png</image114x114>
+    <image120x120>icons/MirrorScreen120.png</image120x120>
+    <image144x144>icons/MirrorScreen144.png</image144x144>
+    <image152x152>icons/MirrorScreen152.png</image152x152>
+  </icon>
+  <supportedProfiles>extendedDesktop</supportedProfiles>
 </application>

@@ -13,15 +13,12 @@ package mirrorScreen.kinect
 	 */
 	public class KinectSocket extends Socket 
 	{
-		public static const COLOR_IMAGE_SIGN:String = "+CLR";
-		public static const BODY_INDEX_IMAGE_SIGN:String = "+BDY";
 		public static const BODY_DATA_SIGN:String = "+BDD";
+		public static const BODY_DATA_EVENT:String = "bodyDataEvent";
 		
 		private	var _data:ByteArray = new ByteArray();
 		private var isReading:Boolean = false;
 		private var _currentReadingData:String;
-		private var _kinectFrame:KinectFrame;
-		
 		
 		public function KinectSocket(host:String=null, port:int=0) 
 		{
@@ -30,14 +27,6 @@ package mirrorScreen.kinect
 			if (host && port)  {
 				super.connect(host, port);
 			}
-			
-			_kinectFrame = new KinectFrame();
-			_kinectFrame.addEventListener(KinectFrame.START_LOAD_FRAME, onStartLoadFrame);
-		}
-		
-		private function onStartLoadFrame(e:Event):void 
-		{
-			callRequestDataCommand();
 		}
 		
 		private function configureListeners():void {
@@ -53,11 +42,8 @@ package mirrorScreen.kinect
 		}
 
 		private function connectHandler(event:Event):void {
-			//trace("connectHandler: " + event);
-			_kinectFrame.colorImageFlag = false;
-			_kinectFrame.bodyIndexImageFlag = false;
-			_kinectFrame.bodyDataFlag = true;
-			_kinectFrame.start();
+			trace("connectHandler: " + event);
+			callRequestDataCommand();
 		}
 
 		private function ioErrorHandler(event:IOErrorEvent):void {
@@ -77,8 +63,6 @@ package mirrorScreen.kinect
 			//read 4 begin bytes
 			var headerSign:String = dataTemp.readUTFBytes(4);
 			switch(headerSign) {
-				case COLOR_IMAGE_SIGN:
-				case BODY_INDEX_IMAGE_SIGN:
 				case BODY_DATA_SIGN:
 					isReading = true;
 					_currentReadingData = headerSign;
@@ -104,20 +88,8 @@ package mirrorScreen.kinect
 				
 				isReading = false;
 				
-				switch (_currentReadingData) {
-					case COLOR_IMAGE_SIGN:
-						_kinectFrame.colorImageReceived = true;
-						_kinectFrame.colorImage = _data;
-						break;
-					case BODY_INDEX_IMAGE_SIGN:
-						_kinectFrame.bodyIndexImageReceived = true;
-						_kinectFrame.bodyIndexImage = _data;
-						break;
-					case BODY_DATA_SIGN:
-						_kinectFrame.bodyDataReceived = true;
-						_kinectFrame.bodyData = _data;
-						break;
-				}
+				dispatchEvent(new Event(BODY_DATA_EVENT));
+				callRequestDataCommand();
 			} else {
 				return;
 			}
@@ -125,33 +97,23 @@ package mirrorScreen.kinect
 		
 		private function callRequestDataCommand():void {
 			if (connected) {
-				if (_kinectFrame.colorImageFlag || _kinectFrame.bodyIndexImageFlag || _kinectFrame.bodyDataFlag) {
-					var object:Object = {
-						"command":"requestData",
-						"dataReceive":{
-							"colorImage":_kinectFrame.colorImageFlag,
-							"bodyIndexImage":_kinectFrame.bodyIndexImageFlag,
-							"bodyData":_kinectFrame.bodyDataFlag
-						}
-					};
-					
-					writeUTFBytes(JSON.stringify(object));
-					flush();
-					//trace("callRequestDataCommand: "+ JSON.stringify(object));
-				}
+				var object:Object = {
+					"command":"requestData",
+					"dataReceive":{
+						"colorImage":false,
+						"bodyIndexImage":false,
+						"bodyData":true
+					}
+				};
 				
-				
+				writeUTFBytes(JSON.stringify(object));
+				flush();
 			}
 		}
 		
-		public function get currentReadingData():String 
+		public function get data():ByteArray 
 		{
-			return _currentReadingData;
-		}
-		
-		public function get kinectFrame():KinectFrame 
-		{
-			return _kinectFrame;
+			return _data;
 		}
 	}
 

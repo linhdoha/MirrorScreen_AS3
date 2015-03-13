@@ -10,7 +10,6 @@ package mirrorScreen.data
 	public class BodyData extends EventDispatcher
 	{
 		public static const DATA_CHANGED:String = "dataChange";
-		private var _trackingID:Number;
 		private var _bodyData:*;
 		
 		public function BodyData() 
