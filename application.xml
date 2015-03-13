@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<application xmlns="http://ns.adobe.com/air/application/15.0">
+<application xmlns="http://ns.adobe.com/air/application/16.0">
   <id>MirrorScreen</id>
   <versionNumber>1.0</versionNumber>
   <filename>Mirror Screen</filename>
@@ -32,5 +32,5 @@
     <image144x144>icons/MirrorScreen144.png</image144x144>
     <image152x152>icons/MirrorScreen152.png</image152x152>
   </icon>
-  <supportedProfiles>extendedDesktop</supportedProfiles>
+  <supportedProfiles>extendedDesktop desktop</supportedProfiles>
 </application>

@@ -1,7 +1,7 @@
 :user_configuration
 
 :: Path to Flex SDK
-set FLEX_SDK=C:\Program Files (x86)\Adobe Gaming SDK 1.4\AIR SDK
+set FLEX_SDK=E:\Downloads\Compressed\AIRSDK_Compiler
 
 
 :validation
