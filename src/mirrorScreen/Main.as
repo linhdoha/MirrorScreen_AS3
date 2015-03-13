@@ -3,7 +3,9 @@ package mirrorScreen
 {
 	import com.adobe.images.JPGEncoder;
 	import com.adobe.images.PNGEncoder;
+	import flash.desktop.NativeApplication;
 	import flash.desktop.NativeProcess;
+	import flash.desktop.NativeProcessStartupInfo;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -11,6 +13,8 @@ package mirrorScreen
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.events.NativeProcessExitEvent;
+	import flash.events.ProgressEvent;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
@@ -48,6 +52,7 @@ package mirrorScreen
 		private var bitmapData:BitmapData;
 		private var data:ByteArray;
 		private var imageBytes:ByteArray;
+		private var process:NativeProcess;
 		
 		public function Main()
 		{
@@ -97,11 +102,19 @@ package mirrorScreen
 			countDown.y = stage.stageHeight / 2;
 			addChild(countDown);
 			
+			
+			//Kinect Server Console
 			var nativeProcess:NativeProcess;
 			trace(NativeProcess.isSupported);
+			var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
+			var file:File = File.applicationDirectory.resolvePath("KinectServerConsole.exe");
+			nativeProcessStartupInfo.executable = file;
 			
+			process = new NativeProcess();
+			process.start(nativeProcessStartupInfo);
+			process.addEventListener(NativeProcessExitEvent.EXIT, onProcessExit);
 			
-			//worker
+			//Save Image Worker
 			data = new ByteArray();
 			data.shareable = true;
 			
@@ -119,6 +132,22 @@ package mirrorScreen
 			saveImageWorker.setSharedProperty("sourceImage", imageBytes);
 			saveImageWorker.setSharedProperty("data", data);
 			saveImageWorker.start();
+			
+			stage.nativeWindow.addEventListener(Event.CLOSING, onAppClosing);
+		}
+		
+		private function onAppClosing(e:Event):void 
+		{
+			e.preventDefault();
+			if (process.running) {
+				process.exit(true);
+			}
+		}
+		
+		private function onProcessExit(e:NativeProcessExitEvent):void 
+		{
+			trace("Process exit");
+			NativeApplication.nativeApplication.exit();
 		}
 		
 		private function onDoubleClick(e:MouseEvent):void 
