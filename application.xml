@@ -33,4 +33,8 @@
     <image152x152>icons/MirrorScreen152.png</image152x152>
   </icon>
   <supportedProfiles>extendedDesktop desktop</supportedProfiles>
+  <description>An experience in Digital Story conference series.</description>
+  <copyright>Admicro - VCCorp, 2015</copyright>
+  <versionLabel>First Grade version</versionLabel>
+  <programMenuFolder>Digital Story 2015</programMenuFolder>
 </application>

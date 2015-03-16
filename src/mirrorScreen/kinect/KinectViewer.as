@@ -2,6 +2,7 @@ package mirrorScreen.kinect
 {
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.geom.ColorTransform;
 	import flash.media.Camera;
 	import flash.media.Video;
 	import flash.utils.ByteArray;
@@ -21,8 +22,6 @@ package mirrorScreen.kinect
 		private var colorImageVideo:Video;
 		private var colorImageVideoHolder:Sprite;
 		
-		private var colorFeed:LiveVideoFeed;
-		
 		private var _bodyData:NBodyData;
 		
 		private var skeletonHolder:Sprite;
@@ -31,6 +30,8 @@ package mirrorScreen.kinect
 		private var _mirror:Boolean = false;
 		private var _colorImageSource:Camera;
 		private var _bodyIndexImageSource:Camera;
+		private var colorTransform:ColorTransform;
+		private var _white:int = 0;
 		
 		public function KinectViewer() 
 		{
@@ -46,9 +47,6 @@ package mirrorScreen.kinect
 			
 			skeletonHolder = new Sprite();
 			addChild(skeletonHolder);
-			
-			colorFeed = new LiveVideoFeed();
-			addChild(colorFeed);
 		}
 		
 		private function onDataChanged(e:Event):void 
@@ -151,6 +149,19 @@ package mirrorScreen.kinect
 		{
 			return _mirror;
 		}
+		
+		public function get white():int 
+		{
+			return _white;
+		}
+		
+		public function set white(value:int):void 
+		{
+			_white = value;
+			colorTransform.redOffset = colorTransform.greenOffset = colorTransform.blueOffset = value;
+		}
+		
+		
 	}
 
 }

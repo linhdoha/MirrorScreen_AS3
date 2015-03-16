@@ -14,7 +14,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'13-Mar-15'</value>
+      <value>'16-Mar-15'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -36,6 +36,7 @@
     </source-path>
     <library-path append="true">
       <path-element>E:\Google Drive\Admicro\Digital Story 2014\Touching Jouney\Coding\MirrorScreen_AS3\lib\assets.swc</path-element>
+      <path-element>E:\Google Drive\Admicro\Digital Story 2014\Touching Jouney\Coding\MirrorScreen_AS3\lib\greensock.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>

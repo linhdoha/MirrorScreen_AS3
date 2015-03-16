@@ -1,32 +1,17 @@
 
 package mirrorScreen
 {
-	import com.adobe.images.JPGEncoder;
-	import com.adobe.images.PNGEncoder;
 	import flash.desktop.NativeApplication;
-	import flash.desktop.NativeProcess;
-	import flash.desktop.NativeProcessStartupInfo;
-	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageDisplayState;
-	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.events.NativeProcessExitEvent;
-	import flash.events.ProgressEvent;
-	import flash.filesystem.File;
-	import flash.filesystem.FileMode;
-	import flash.filesystem.FileStream;
 	import flash.media.Camera;
-	import flash.system.MessageChannel;
-	import flash.system.Worker;
-	import flash.system.WorkerDomain;
-	import flash.utils.ByteArray;
 	import mirrorScreen.data.Configuration;
-	import mirrorScreen.displayComponents.CountDown;
 	import mirrorScreen.displayComponents.SkeletonDisplayer;
-	import mirrorScreen.displayComponents.LiveVideoFeed;
+	import mirrorScreen.displayComponents.SnapShooter;
+	import mirrorScreen.kinect.KinectConsole;
 	import mirrorScreen.kinect.KinectSocket;
 	import mirrorScreen.kinect.KinectViewer;
 	
@@ -36,23 +21,13 @@ package mirrorScreen
 	 */
 	public class Main extends Sprite
 	{
-		private var kinectSocketCompact:KinectSocket;
-		
+		private var kinectSocket:KinectSocket;
 		private var kinectViewer:KinectViewer;
-		
 		private var colorCamera:Camera;
 		private var bodyIndexCamera:Camera;
-		
-		private var countDown:CountDown;
 		private var configuration:Configuration;
-		private var saveImageWorker:Worker;
-		private var wtm:MessageChannel;
-		private var mtw:MessageChannel;
-		private var fileExtension:String;
-		private var bitmapData:BitmapData;
-		private var data:ByteArray;
-		private var imageBytes:ByteArray;
-		private var process:NativeProcess;
+		private var snapShooter:SnapShooter;
+		private var kinectConsole:KinectConsole;
 		
 		public function Main()
 		{
@@ -93,61 +68,34 @@ package mirrorScreen
 				kinectViewer.attachBodyIndexImageSource(bodyIndexCamera);
 			}
 			
-			kinectSocketCompact = new KinectSocket(configuration.kinectServerHost, configuration.kinectServerPort);
-			kinectSocketCompact.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
+			kinectSocket = new KinectSocket(configuration.kinectServerHost, configuration.kinectServerPort);
+			kinectSocket.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
 			
-			countDown = new CountDown();
-			countDown.addEventListener(CountDown.COUNT_COMPLETED, onCountCompleted);
-			countDown.x = stage.stageWidth / 2;
-			countDown.y = stage.stageHeight / 2;
-			addChild(countDown);
-			
-			
-			//Kinect Server Console
-			var nativeProcess:NativeProcess;
-			trace(NativeProcess.isSupported);
-			var nativeProcessStartupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo();
-			var file:File = File.applicationDirectory.resolvePath("KinectServerConsole.exe");
-			nativeProcessStartupInfo.executable = file;
-			
-			process = new NativeProcess();
-			process.start(nativeProcessStartupInfo);
-			process.addEventListener(NativeProcessExitEvent.EXIT, onProcessExit);
-			
-			//Save Image Worker
-			data = new ByteArray();
-			data.shareable = true;
-			
-			imageBytes = new ByteArray();
-			imageBytes.shareable = true;
-			
-			saveImageWorker = WorkerDomain.current.createWorker(Workers.SaveImageWorker,true);
-			wtm = saveImageWorker.createMessageChannel(Worker.current);
-			mtw = Worker.current.createMessageChannel(saveImageWorker);
-			
-			wtm.addEventListener(Event.CHANNEL_MESSAGE, onMessageFromWorker);
-			
-			saveImageWorker.setSharedProperty("wtm",wtm);
-			saveImageWorker.setSharedProperty("mtw", mtw);
-			saveImageWorker.setSharedProperty("sourceImage", imageBytes);
-			saveImageWorker.setSharedProperty("data", data);
-			saveImageWorker.start();
-			
+			kinectConsole = new KinectConsole();
+			kinectConsole.addEventListener(KinectConsole.PROCESS_EXIT, onConsoleExit);
 			stage.nativeWindow.addEventListener(Event.CLOSING, onAppClosing);
+			
+			snapShooter = new SnapShooter();
+			snapShooter.target = kinectViewer;
+			snapShooter.imageFileType = configuration.imageFileType;
+			snapShooter.imageFileQuality = configuration.imageFileQuality;
+			snapShooter.prenameOfImage = configuration.prenameOfImage;
+			snapShooter.storageDir = configuration.storageDir;
+			addChild(snapShooter);
+		}
+		
+		private function onConsoleExit(e:Event):void 
+		{
+			trace("Console exit");
+			NativeApplication.nativeApplication.exit();
 		}
 		
 		private function onAppClosing(e:Event):void 
 		{
 			e.preventDefault();
-			if (process.running) {
-				process.exit(true);
+			if (kinectConsole.running) {
+				kinectConsole.exit();
 			}
-		}
-		
-		private function onProcessExit(e:NativeProcessExitEvent):void 
-		{
-			trace("Process exit");
-			NativeApplication.nativeApplication.exit();
 		}
 		
 		private function onDoubleClick(e:MouseEvent):void 
@@ -159,48 +107,14 @@ package mirrorScreen
 			}
 		}
 		
-		private function onCountCompleted(e:Event):void 
-		{
-			bitmapData = new BitmapData(kinectViewer.width, kinectViewer.height, false);
-			bitmapData.draw(kinectViewer);
-			imageBytes.length = 0;
-			bitmapData.copyPixelsToByteArray(bitmapData.rect, imageBytes);
-			
-			if (configuration.imageFileType == "PNG") {
-				fileExtension = ".png";
-			} else {
-				fileExtension = ".jpg";
-			}
-			
-			var commandObj:Object = {
-				command:"SAVE_IMAGE",
-				width:bitmapData.rect.width,
-				height:bitmapData.rect.height,
-				encode:configuration.imageFileType,
-				quality:configuration.imageFileQuality,
-				filename:configuration.prenameOfImage+String(new Date().time + fileExtension),
-				dir:configuration.storageDir
-			}
-			
-			mtw.send(commandObj);
-		}
-		
-		private function onMessageFromWorker(e:Event):void 
-		{
-			var messageReceived:* = wtm.receive();
-			if (messageReceived == "ENCODE_COMPLETED") {
-				trace("ENCODE_COMPLETED");
-			}
-		}
-		
 		private function onSnapCommandEvent(e:Event):void 
 		{
-			countDown.start();
+			snapShooter.startCount();
 		}
 		
 		private function onBodyDataEvent(e:Event):void {
-			kinectSocketCompact.data.position = 0;
-			kinectViewer.bodyData = kinectSocketCompact.data.readUTFBytes(kinectSocketCompact.data.bytesAvailable);
+			kinectSocket.data.position = 0;
+			kinectViewer.bodyData = kinectSocket.data.readUTFBytes(kinectSocket.data.bytesAvailable);
 		}
 	}
 
