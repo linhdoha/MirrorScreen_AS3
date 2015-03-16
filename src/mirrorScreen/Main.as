@@ -46,11 +46,13 @@ package mirrorScreen
 			stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 			stage.align = StageAlign.TOP_LEFT;
 			
-			stage.doubleClickEnabled = true;
-			stage.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
+			
 			
 			kinectViewer = new KinectViewer();
 			kinectViewer.addEventListener(SkeletonDisplayer.SNAP_COMMAND_EVENT, onSnapCommandEvent);
+			kinectViewer.mouseChildren = false;
+			kinectViewer.doubleClickEnabled = true;
+			kinectViewer.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
 			addChild(kinectViewer);
 			
 			configuration = new Configuration();
@@ -100,6 +102,7 @@ package mirrorScreen
 		
 		private function onDoubleClick(e:MouseEvent):void 
 		{
+			trace("double click");
 			if (stage.displayState == StageDisplayState.NORMAL) {
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 			} else {
