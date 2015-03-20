@@ -6,6 +6,8 @@ package mirrorScreen.displayComponents
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import flash.system.MessageChannel;
 	import flash.system.Worker;
 	import flash.system.WorkerDomain;
@@ -25,7 +27,7 @@ package mirrorScreen.displayComponents
 		private var wtm:MessageChannel;
 		private var mtw:MessageChannel;
 		private var countDown:CountDown;
-		private var bitmap:FlickrBitmap;
+		private var flickrBitmap:FlickrBitmap;
 		private var timeline:TimelineLite;
 		private var _target:DisplayObject;
 		private var _imageFileType:String = "PNG";
@@ -38,6 +40,7 @@ package mirrorScreen.displayComponents
 		public function SnapShooter() 
 		{
 			super();
+			
 			addEventListener(Event.ADDED_TO_STAGE, onStage);
 		}
 		
@@ -51,8 +54,7 @@ package mirrorScreen.displayComponents
 			
 			countDown = new CountDown();
 			countDown.addEventListener(CountDown.COUNT_COMPLETED, onCountCompleted);
-			countDown.x = stage.stageWidth / 2;
-			countDown.y = stage.stageHeight / 2;
+			redraw();
 			addChild(countDown);
 			
 			//Save Image Worker
@@ -85,15 +87,17 @@ package mirrorScreen.displayComponents
 		
 		private function onCountCompleted(e:Event):void 
 		{
-			bitmapData = new BitmapData(_target.width, _target.height, false);
-			bitmapData.draw(_target);
+			var targetCopy:BitmapData = new BitmapData(_target.width, _target.height, false);
+			targetCopy.draw(_target);
 			
-			bitmap = new FlickrBitmap(bitmapData);
-			addChild(bitmap);
+			bitmapData = new BitmapData(_target.scrollRect.width, _target.scrollRect.height, false);
+			bitmapData.copyPixels(targetCopy, new Rectangle(0,0,_target.scrollRect.width,_target.scrollRect.height), new Point());
 			
-			timeline = new TimelineLite({onComplete:onFlickrComplete});
-			timeline.append(new TweenLite(bitmap, 0.2, { white:255 } ));
-			timeline.append(new TweenLite(bitmap, 1, { white:0 } ));
+			flickrBitmap = new FlickrBitmap(bitmapData);
+			flickrBitmap.addEventListener(FlickrBitmap.FLICKR_COMPLETED, onFlickrComplete);
+			redraw();
+			addChild(flickrBitmap);
+			flickrBitmap.flickr();
 			
 			imageBytes.length = 0;
 			bitmapData.copyPixelsToByteArray(bitmapData.rect, imageBytes);
@@ -117,8 +121,21 @@ package mirrorScreen.displayComponents
 			mtw.send(commandObj);
 		}
 		
-		private function onFlickrComplete():void {
-			this.removeChild(bitmap);
+		private function onFlickrComplete(e:Event):void {
+			this.removeChild(FlickrBitmap(e.currentTarget));
+		}
+		
+		public function redraw():void {
+			countDown.x = stage.stageWidth / 2;
+			countDown.y = stage.stageHeight / 2;
+			
+			if (flickrBitmap != null) {
+				flickrBitmap.height = stage.stageHeight;
+				flickrBitmap.scaleX = flickrBitmap.scaleY;
+				flickrBitmap.x = stage.stageWidth / 2 - flickrBitmap.width / 2;
+				flickrBitmap.y = stage.stageHeight / 2 - flickrBitmap.height / 2;
+			}
+			
 		}
 		
 		public function get target():DisplayObject 

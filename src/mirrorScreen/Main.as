@@ -1,19 +1,20 @@
 
 package mirrorScreen
 {
+	import com.nidlab.kinect.KinectConsole;
+	import com.nidlab.kinect.KinectSocket;
+	import com.nidlab.kinect.KinectV2Description;
 	import flash.desktop.NativeApplication;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageDisplayState;
+	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.media.Camera;
-	import mirrorScreen.data.Configuration;
-	import mirrorScreen.displayComponents.SkeletonDisplayer;
+	import mirrorScreen.Configuration;
+	import mirrorScreen.displayComponents.ScreenViewer;
 	import mirrorScreen.displayComponents.SnapShooter;
-	import mirrorScreen.kinect.KinectConsole;
-	import mirrorScreen.kinect.KinectSocket;
-	import mirrorScreen.kinect.KinectViewer;
+	import mirrorScreen.themes.fireMirror.Mirror;
 	
 	/**
 	 * ...
@@ -22,10 +23,8 @@ package mirrorScreen
 	public class Main extends Sprite
 	{
 		private var kinectSocket:KinectSocket;
-		private var kinectViewer:KinectViewer;
-		private var colorCamera:Camera;
-		private var bodyIndexCamera:Camera;
-		private var configuration:Configuration;
+		private var screenViewer:ScreenViewer;
+		private var appConfig:Configuration;
 		private var snapShooter:SnapShooter;
 		private var kinectConsole:KinectConsole;
 		
@@ -42,82 +41,105 @@ package mirrorScreen
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
 			
-			//stage.scaleMode = StageScaleMode.NO_SCALE;
-			stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
+			stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+			stage.addEventListener(Event.RESIZE, onStageResize);
+			//stage.addEventListener(FullScreenEvent.FULL_SCREEN, onStageResize);
+			stage.nativeWindow.addEventListener(Event.CLOSING, onAppClosing);
 			
+			appConfig = Configuration.getInstance();
 			
+			screenViewer = new ScreenViewer();
+			screenViewer.addEventListener(Mirror.SNAP_COMMAND_EVENT, onSnapCommandEvent);
+			screenViewer.mouseChildren = false;
+			screenViewer.doubleClickEnabled = true;
+			screenViewer.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
+			addChild(screenViewer);
 			
-			kinectViewer = new KinectViewer();
-			kinectViewer.addEventListener(SkeletonDisplayer.SNAP_COMMAND_EVENT, onSnapCommandEvent);
-			kinectViewer.mouseChildren = false;
-			kinectViewer.doubleClickEnabled = true;
-			kinectViewer.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
-			addChild(kinectViewer);
+			screenViewer.theme = ScreenViewer.FIRE_THEME;
 			
-			configuration = new Configuration();
-			
-			colorCamera = Camera.getCamera(configuration.kinectCameraID);
-			if (colorCamera != null) {
-				colorCamera.setMode(configuration.kinectCameraWidth, configuration.kinectCameraHeight, 30);
-				kinectViewer.attachColorImageSource(colorCamera);
-				kinectViewer.mirror = configuration.kinectCameraMirror;
-			}
-			
-			bodyIndexCamera = Camera.getCamera(configuration.kinectBodyIndexCameraID);
-			if (bodyIndexCamera != null) {
-				bodyIndexCamera.setMode(configuration.kinectBodyIndexCameraWidth, configuration.kinectBodyIndexCameraHeight, 30);
-				kinectViewer.attachBodyIndexImageSource(bodyIndexCamera);
-			}
-			
-			kinectSocket = new KinectSocket(configuration.kinectServerHost, configuration.kinectServerPort);
+			kinectSocket = new KinectSocket(KinectV2Description.HOST, KinectV2Description.PORT);
 			kinectSocket.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
+			kinectSocket.addEventListener(Event.CLOSE, onSocketClose);
 			
 			kinectConsole = new KinectConsole();
 			kinectConsole.addEventListener(KinectConsole.PROCESS_EXIT, onConsoleExit);
-			stage.nativeWindow.addEventListener(Event.CLOSING, onAppClosing);
 			
 			snapShooter = new SnapShooter();
-			snapShooter.target = kinectViewer;
-			snapShooter.imageFileType = configuration.imageFileType;
-			snapShooter.imageFileQuality = configuration.imageFileQuality;
-			snapShooter.prenameOfImage = configuration.prenameOfImage;
-			snapShooter.storageDir = configuration.storageDir;
+			snapShooter.target = screenViewer;
+			snapShooter.imageFileType = appConfig.imageFileType;
+			snapShooter.imageFileQuality = appConfig.imageFileQuality;
+			snapShooter.prenameOfImage = appConfig.prenameOfImage;
+			snapShooter.storageDir = appConfig.storageDir;
 			addChild(snapShooter);
 		}
 		
-		private function onConsoleExit(e:Event):void 
+		private function onStageResize(e:Event):void
 		{
-			trace("Console exit");
-			NativeApplication.nativeApplication.exit();
+			redraw();
 		}
 		
-		private function onAppClosing(e:Event):void 
+		private function redraw():void
+		{
+			screenViewer.redraw();
+			snapShooter.redraw();
+		}
+		
+		private function onConsoleExit(e:Event):void
+		{
+			trace("Console exited");
+			checkToExit();
+		}
+		
+		private function onAppClosing(e:Event):void
 		{
 			e.preventDefault();
-			if (kinectConsole.running) {
+			if (kinectConsole.running)
+			{
 				kinectConsole.exit();
+			}
+			if (kinectSocket.connected)
+			{
+				kinectSocket.close();
 			}
 		}
 		
-		private function onDoubleClick(e:MouseEvent):void 
+		private function onSocketClose(e:Event):void
 		{
-			trace("double click");
-			if (stage.displayState == StageDisplayState.NORMAL) {
+			trace("Socket closed");
+			checkToExit();
+		}
+		
+		private function checkToExit():void
+		{
+			if (!kinectConsole.running && !kinectSocket.connected)
+			{
+				NativeApplication.nativeApplication.exit();
+			}
+		}
+		
+		private function onDoubleClick(e:MouseEvent):void
+		{
+			if (stage.displayState == StageDisplayState.NORMAL)
+			{
 				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
-			} else {
+			}
+			else
+			{
 				stage.displayState = StageDisplayState.NORMAL;
 			}
 		}
 		
-		private function onSnapCommandEvent(e:Event):void 
+		private function onSnapCommandEvent(e:Event):void
 		{
 			snapShooter.startCount();
 		}
 		
-		private function onBodyDataEvent(e:Event):void {
+		private function onBodyDataEvent(e:Event):void
+		{
 			kinectSocket.data.position = 0;
-			kinectViewer.bodyData = kinectSocket.data.readUTFBytes(kinectSocket.data.bytesAvailable);
+			screenViewer.bodyData = kinectSocket.data.readUTFBytes(kinectSocket.data.bytesAvailable);
 		}
 	}
 

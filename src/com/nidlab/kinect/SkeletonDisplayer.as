@@ -1,13 +1,7 @@
-package mirrorScreen.displayComponents
+package com.nidlab.kinect
 {
-	import flash.display.Sprite;
-	import flash.events.Event;
-	import flash.filters.BlurFilter;
-	import flash.geom.Point;
-	import mirrorScreen.displayComponents.Hand;
-	import com.nidlab.fx.BaseEffect;
-	import com.nidlab.fx.FireEffect;
 	import com.nidlab.utils.ColorStyle;
+	import flash.display.Sprite;
 	
 	/**
 	 * ...
@@ -15,14 +9,15 @@ package mirrorScreen.displayComponents
 	 */
 	public class SkeletonDisplayer extends Sprite 
 	{
-		public static const SNAP_COMMAND_EVENT:String = "snapCommandEvent";
+		//public static const SNAP_COMMAND_EVENT:String = "snapCommandEvent";
 		
 		private var _trackingID:Number;
 		private var color:uint;
 		private var _leftHand:Hand;
 		private var _rightHand:Hand;
-		private var _leftHandEffect:BaseEffect;
-		private var _rightHandEffect:BaseEffect;
+		private var _debugMode:Boolean = false;
+		/*private var _leftHandEffect:BaseEffect;
+		private var _rightHandEffect:BaseEffect;*/
 		public function SkeletonDisplayer() 
 		{
 			super();
@@ -32,7 +27,7 @@ package mirrorScreen.displayComponents
 			_rightHand = new Hand(color);
 			addChild(_rightHand);
 			
-			_leftHandEffect = new FireEffect();
+			/*_leftHandEffect = new FireEffect();
 			_leftHandEffect.depth = _leftHand.depth;
 			_leftHandEffect.followee = _leftHand;
 			addChild(_leftHandEffect);
@@ -42,10 +37,10 @@ package mirrorScreen.displayComponents
 			_rightHandEffect.followee = _rightHand;
 			addChild(_rightHandEffect);
 			
-			addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			addEventListener(Event.ENTER_FRAME, onEnterFrame);*/
 		}
 		
-		private function onEnterFrame(e:Event):void 
+		/*private function onEnterFrame(e:Event):void 
 		{
 			//detect snap command
 			if (_leftHand.state == 4 && _rightHand.state == 4) {
@@ -72,24 +67,6 @@ package mirrorScreen.displayComponents
 			
 			_leftHandEffect.depth = _leftHand.depth;
 			_rightHandEffect.depth = _rightHand.depth;
-			
-			
-			/*var r:int = 10;
-			for (var i:int=0;i<3;i++) {
-				var pointTemp:Point = Point.polar(Math.round(Math.random()*r),Math.round(Math.random()*2*Math.PI));
-				pointTemp = pointTemp.add(new Point(Hand(e.currentTarget).x,Hand(e.currentTarget).y));
-				var tpTemp:TailParticle = new TailParticle();
-				tpTemp.addEventListener(TailParticle.ANIMATION_END, onTailAnimationEnd);
-				tpTemp.x = pointTemp.x;
-				tpTemp.y = pointTemp.y;
-				this.addChild(tpTemp);
-			}*/
-		}
-		
-		/*private function onTailAnimationEnd(e:Event):void 
-		{
-			TailParticle(e.currentTarget).removeEventListener(TailParticle.ANIMATION_END, onTailAnimationEnd);
-			removeChild(TailParticle(e.currentTarget));
 		}*/
 		
 		public function get trackingID():Number 
@@ -110,6 +87,26 @@ package mirrorScreen.displayComponents
 		public function get rightHand():Hand 
 		{
 			return _rightHand;
+		}
+		
+		public function get debugMode():Boolean 
+		{
+			return _debugMode;
+		}
+		
+		public function set debugMode(value:Boolean):void 
+		{
+			_debugMode = value;
+			
+			if (_debugMode) {
+				_leftHand.graphics.lineStyle(4, 0x00FFFF, 0.8);
+				_leftHand.graphics.drawCircle(0, 0, 80);
+				_rightHand.graphics.lineStyle(4, 0x00FFFF, 0.8);
+				_rightHand.graphics.drawCircle(0, 0, 80);
+			} else {
+				_leftHand.graphics.clear();
+				_rightHand.graphics.clear();
+			}
 		}
 	}
 

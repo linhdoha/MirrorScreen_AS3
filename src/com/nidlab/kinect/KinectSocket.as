@@ -1,4 +1,4 @@
-package mirrorScreen.kinect 
+package com.nidlab.kinect 
 {
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;

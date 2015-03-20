@@ -1,4 +1,4 @@
-package mirrorScreen.kinect 
+package com.nidlab.kinect 
 {
 	import flash.desktop.NativeProcess;
 	import flash.desktop.NativeProcessStartupInfo;

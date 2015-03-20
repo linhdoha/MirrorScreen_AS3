@@ -3,6 +3,7 @@ package com.nidlab.fx
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.filters.BlurFilter;
+	import mirrorScreen.themes.fireMirror.FSprite;
 	
 	/**
 	 * ...
@@ -26,7 +27,7 @@ package com.nidlab.fx
 			super.draw();
 			if (isRunning) {
 				for(i=0;i<2;i++) {
-					var s:Sprite = new Sprite();
+					var s:FSprite = new FSprite();
 					s.alpha = Math.random()*0.5+0.5;
 					s.graphics.beginFill((Math.random()*0xffffff)&0x00FF00);
 					var rnd:Number = (Math.random() * 20 + 10)/depth;

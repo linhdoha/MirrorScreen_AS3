@@ -1,4 +1,4 @@
-package mirrorScreen.data 
+package com.nidlab.kinect 
 {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -7,12 +7,12 @@ package mirrorScreen.data
 	 * ...
 	 * @author Linhdoha
 	 */
-	public class NBodyData extends EventDispatcher
+	public class BodyDataReader extends EventDispatcher
 	{
 		public static const DATA_CHANGED:String = "dataChange";
 		private var _bodyData:*;
 		
-		public function NBodyData() 
+		public function BodyDataReader() 
 		{
 			
 		}

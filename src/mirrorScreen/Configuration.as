@@ -1,4 +1,4 @@
-package mirrorScreen.data 
+package mirrorScreen 
 {
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
@@ -12,6 +12,7 @@ package mirrorScreen.data
 		private const CONFIG_FILE_PATH:String = "config.xml";
 		private var file:File;
 		private var config:XML;
+		static private var _instance:Configuration;
 		
 		public function Configuration() 
 		{
@@ -19,47 +20,18 @@ package mirrorScreen.data
 			read();
 		}
 		
+		public static function getInstance():Configuration {
+			if (_instance == null) {
+				_instance = new Configuration();
+			}
+			return _instance;
+		}
+		
 		private function read():void {
 			var fs:FileStream = new FileStream();
 			fs.open(file, FileMode.READ);
 			config = XML(fs.readUTFBytes(fs.bytesAvailable));
 			fs.close();
-		}
-		
-		public function get kinectCameraID():String {
-			return config.kinectCamera.@id;
-		}
-		
-		public function get kinectCameraMirror():Boolean {
-			return config.kinectCamera.@mirror == "true";
-		}
-		
-		public function get kinectCameraWidth():int {
-			return int(config.kinectCamera.@width);
-		}
-		
-		public function get kinectCameraHeight():int {
-			return int(config.kinectCamera.@height);
-		}
-		
-		public function get kinectBodyIndexCameraID():String {
-			return config.kinectCameraBodyIndex.@id;
-		}
-		
-		public function get kinectBodyIndexCameraWidth():int {
-			return int(config.kinectCameraBodyIndex.@width);
-		}
-		
-		public function get kinectBodyIndexCameraHeight():int {
-			return int(config.kinectCameraBodyIndex.@height);
-		}
-		
-		public function get kinectServerHost():String {
-			return config.kinectServer.@host;
-		}
-		
-		public function get kinectServerPort():int {
-			return int(config.kinectServer.@port);
 		}
 		
 		public function get storageDir():String {
@@ -76,6 +48,14 @@ package mirrorScreen.data
 		
 		public function get imageFileQuality():int {
 			return int(config.imageFile.@quality);
+		}
+		
+		public function get themeWidth():int {
+			return int(config.theme.@width);
+		}
+		
+		public function get themeHeight():int {
+			return int(config.theme.@height);
 		}
 	}
 

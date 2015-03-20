@@ -56,6 +56,9 @@
   <libraryPaths>
     <element path="lib\assets.swc" />
     <element path="lib\greensock.swc" />
+    <element path="lib\UltimateBlendModeShader.swc" />
+    <element path="lib\TripleMirror.swc" />
+    <element path="lib\FireMirror.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
