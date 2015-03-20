@@ -3,4 +3,5 @@
 	<storageDir path="E:\Google Drive\Photos\MirrorSnaps" />
 	<imageFile prename="Mirror_" type="PNG" quality="80" />
 	<theme width="1000" height="1778" />
+	<kinect port="7001" />
 </config>

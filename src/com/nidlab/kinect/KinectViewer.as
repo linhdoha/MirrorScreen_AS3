@@ -29,7 +29,7 @@ package com.nidlab.kinect
 			graphics.drawRoundRect(0, 0, KinectV2Description.COLOR_CAMERA_WIDTH, KinectV2Description.COLOR_CAMERA_HEIGHT, 20, 20);
 			graphics.endFill();
 			
-			var kinectCamera:Camera = KinectCameraManager.getInstance().getKinectCamera();
+			var kinectCamera:Camera = KinectCameraManager.getInstance().getColorCamera();
 			kinectCamera.setMode(KinectV2Description.COLOR_CAMERA_WIDTH, KinectV2Description.COLOR_CAMERA_HEIGHT, KinectV2Description.COLOR_CAMERA_FPS);
 			colorVideo = new Video(kinectCamera.width,kinectCamera.height);
 			colorVideo.attachCamera(kinectCamera);

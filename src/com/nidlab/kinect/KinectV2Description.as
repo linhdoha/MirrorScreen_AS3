@@ -14,8 +14,6 @@ package com.nidlab.kinect
 		public static const BODY_INDEX_CAMERA_WIDTH:int = 512;
 		public static const BODY_INDEX_CAMERA_HEIGHT:int = 424;
 		public static const BODY_INDEX_CAMERA_FPS:int = 30;
-		public static const HOST:String = "localhost";
-		public static const PORT:int = 7001;
 		public function KinectV2Description() 
 		{
 			

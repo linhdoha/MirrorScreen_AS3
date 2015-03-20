@@ -33,11 +33,11 @@ package com.nidlab.kinect
 			return returnIndex;
 		}
 		
-		public function getKinectCamera():Camera {
+		public function getColorCamera():Camera {
 			return Camera.getCamera(String(getCameraIndex(KinectV2Description.COLOR_CAMERA_ID)));
 		}
 		
-		public function getKinectCameraBodyIndex():Camera {
+		public function getBodyIndexCamera():Camera {
 			return Camera.getCamera(String(getCameraIndex(KinectV2Description.BODY_INDEX_CAMERA_ID)));
 		}
 	}

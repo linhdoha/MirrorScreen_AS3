@@ -27,7 +27,7 @@ package mirrorScreen.themes.tripleMirror
 			addChild(view);
 			
 			//setup camera
-			var kinectCamera:Camera = KinectCameraManager.getInstance().getKinectCamera();
+			var kinectCamera:Camera = KinectCameraManager.getInstance().getColorCamera();
 			kinectCamera.setMode(view.mirrorC.mirror.width, view.mirrorC.mirror.height,KinectV2Description.COLOR_CAMERA_FPS);
 			
 			//attach camera to screen

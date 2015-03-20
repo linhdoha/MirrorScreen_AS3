@@ -57,6 +57,10 @@ package mirrorScreen
 		public function get themeHeight():int {
 			return int(config.theme.@height);
 		}
+		
+		public function get kinectPort():int {
+			return int(config.kinect.@port);
+		}
 	}
 
 }

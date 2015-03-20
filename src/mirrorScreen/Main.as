@@ -59,11 +59,11 @@ package mirrorScreen
 			
 			screenViewer.theme = ScreenViewer.FIRE_THEME;
 			
-			kinectSocket = new KinectSocket(KinectV2Description.HOST, KinectV2Description.PORT);
+			kinectSocket = new KinectSocket(appConfig.kinectPort);
 			kinectSocket.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
 			kinectSocket.addEventListener(Event.CLOSE, onSocketClose);
 			
-			kinectConsole = new KinectConsole();
+			kinectConsole = new KinectConsole(appConfig.kinectPort);
 			kinectConsole.addEventListener(KinectConsole.PROCESS_EXIT, onConsoleExit);
 			
 			snapShooter = new SnapShooter();
@@ -138,8 +138,7 @@ package mirrorScreen
 		
 		private function onBodyDataEvent(e:Event):void
 		{
-			kinectSocket.data.position = 0;
-			screenViewer.bodyData = kinectSocket.data.readUTFBytes(kinectSocket.data.bytesAvailable);
+			screenViewer.bodyData = kinectSocket.data;
 		}
 	}
 

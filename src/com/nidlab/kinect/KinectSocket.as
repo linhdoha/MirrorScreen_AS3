@@ -16,16 +16,16 @@ package com.nidlab.kinect
 		public static const BODY_DATA_SIGN:String = "+BDD";
 		public static const BODY_DATA_EVENT:String = "bodyDataEvent";
 		
-		private	var _data:ByteArray = new ByteArray();
+		private	var _byteData:ByteArray = new ByteArray();
 		private var isReading:Boolean = false;
 		private var _currentReadingData:String;
 		
-		public function KinectSocket(host:String=null, port:int=0) 
+		public function KinectSocket(port:int=7001) 
 		{
-			super(host, port);
+			super("localhost",port);
 			configureListeners();
-			if (host && port)  {
-				super.connect(host, port);
+			if (port) {
+				super.connect("localhost", port);
 			}
 		}
 		
@@ -66,7 +66,7 @@ package com.nidlab.kinect
 				case BODY_DATA_SIGN:
 					isReading = true;
 					_currentReadingData = headerSign;
-					_data = new ByteArray();
+					_byteData = new ByteArray();
 					break;
 				default:
 					if (!isReading) {
@@ -76,15 +76,15 @@ package com.nidlab.kinect
 					break;
 			}
 			
-			_data.writeBytes(dataTemp, 0, dataTemp.length);
+			_byteData.writeBytes(dataTemp, 0, dataTemp.length);
 			
 			//check 4 end bytes
 			var f4:ByteArray = new ByteArray();
-			f4.writeBytes(_data, _data.length - 4, 4);
+			f4.writeBytes(_byteData, _byteData.length - 4, 4);
 			if ((f4[0] == 0) && (f4[1] == 0) && (f4[2] == 0) && (f4[3] == 0)) {
-				_data.position = 0;
-				_data.writeBytes(_data, 4, _data.length - 4);
-				_data.length = _data.length - 4;
+				_byteData.position = 0;
+				_byteData.writeBytes(_byteData, 4, _byteData.length - 4);
+				_byteData.length = _byteData.length - 4;
 				
 				isReading = false;
 				
@@ -111,9 +111,10 @@ package com.nidlab.kinect
 			}
 		}
 		
-		public function get data():ByteArray 
+		public function get data():String 
 		{
-			return _data;
+			_byteData.position = 0;
+			return _byteData.readUTFBytes(_byteData.bytesAvailable);
 		}
 	}
 
