@@ -14,7 +14,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'21-Mar-15'</value>
+      <value>'08-Apr-15'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -40,10 +40,11 @@
       <path-element>E:\Google Drive\Admicro\Digital Story 2014\Touching Jouney\Coding\MirrorScreen_AS3\lib\UltimateBlendModeShader.swc</path-element>
       <path-element>E:\Google Drive\Admicro\Digital Story 2014\Touching Jouney\Coding\MirrorScreen_AS3\lib\TripleMirror.swc</path-element>
       <path-element>E:\Google Drive\Admicro\Digital Story 2014\Touching Jouney\Coding\MirrorScreen_AS3\lib\FireMirror.swc</path-element>
+      <path-element>E:\Google Drive\Admicro\Digital Story 2014\Touching Jouney\Coding\MirrorScreen_AS3\lib\DustMirror.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>
-    <path-element>E:\Google Drive\Admicro\Digital Story 2014\Touching Jouney\Coding\MirrorScreen_AS3\src\mirrorScreen\Main.as</path-element>
+    <path-element>E:\Google Drive\Admicro\Digital Story 2014\Touching Jouney\Coding\MirrorScreen_AS3\src\mirrorScreen\SelfieMirror.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

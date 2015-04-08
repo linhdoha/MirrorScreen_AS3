@@ -5,7 +5,7 @@ package mirrorScreen.displayComponents
 	 * ...
 	 * @author Linhdoha
 	 */
-	public class CountDown extends CountDownView 
+	internal class CountDown extends CountDownView 
 	{
 		public static const COUNT_COMPLETED:String = "countCompleted";
 		public function CountDown() 

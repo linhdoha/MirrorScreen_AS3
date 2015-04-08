@@ -3,24 +3,23 @@ package mirrorScreen.themes.fireMirror
 	import com.nidlab.fx.BaseEffect;
 	import com.nidlab.fx.FireEffect;
 	import com.nidlab.kinect.Hand;
-	import flash.events.Event;
-	import flash.geom.Point;
 	import com.nidlab.kinect.KinectViewer;
 	import com.nidlab.kinect.SkeletonDisplayer;
 	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.geom.Point;
 	
 	/**
 	 * ...
 	 * @author Linhdoha
 	 */
-	public class Mirror extends KinectViewer 
+	public class EffectMirror extends KinectViewer 
 	{
-		public static const SNAP_COMMAND_EVENT:String = "snapCommandEvent";
 		private var effectLayer:Sprite;
-		public function Mirror() 
+		public function EffectMirror() 
 		{
 			super();
-			debugMode = false;
+			debugMode = true;
 			
 			effectLayer = new Sprite();
 			addChild(effectLayer);
@@ -34,34 +33,24 @@ package mirrorScreen.themes.fireMirror
 			var _rightHandEffect:BaseEffect;
 			
 			_leftHandEffect = new FireEffect();
+			_leftHandEffect.isRunning = false;
 			_leftHandEffect.depth = currentSkeleton.leftHand.depth;
 			_leftHandEffect.followee = currentSkeleton.leftHand;
 			effectLayer.addChild(_leftHandEffect);
 			
 			_rightHandEffect = new FireEffect();
+			_rightHandEffect.isRunning = false;
 			_rightHandEffect.depth = currentSkeleton.rightHand.depth;
 			_rightHandEffect.followee = currentSkeleton.rightHand;
 			effectLayer.addChild(_rightHandEffect);
 			
 			currentSkeleton.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-			currentSkeleton.addEventListener(Mirror.SNAP_COMMAND_EVENT, onSnapCommandEvent);
 			return currentSkeleton;
-		}
-		
-		private function onSnapCommandEvent(e:Event):void 
-		{
-			dispatchEvent(new Event(Mirror.SNAP_COMMAND_EVENT));
 		}
 		
 		private function onEnterFrame(e:Event):void 
 		{
 			var currentSkeleton:SkeletonDisplayer = SkeletonDisplayer(e.currentTarget);
-			
-			
-			//detect snap command
-			if (currentSkeleton.leftHand.state == 4 && currentSkeleton.rightHand.state == 4) {
-				currentSkeleton.dispatchEvent(new Event(SNAP_COMMAND_EVENT));
-			}
 			
 			switch (currentSkeleton.leftHand.state) {
 				case 2:
@@ -85,20 +74,20 @@ package mirrorScreen.themes.fireMirror
 			getEffectByFollowee(currentSkeleton.rightHand).depth = currentSkeleton.rightHand.depth;
 		}
 		
-		override protected function removeSkeletonDisplayer(index:int):SkeletonDisplayer 
+		override protected function removeSkeletonDisplayer(trackingID:Number):SkeletonDisplayer 
 		{
-			var currentSkeleton:SkeletonDisplayer = skeletonDisplayerList[index];
+			var currentSkeleton:SkeletonDisplayer = super.removeSkeletonDisplayer(trackingID);
 			
-			for (var i:int = effectLayer.numChildren-1; i >= 0; i--) {
+			for (var i:int = effectLayer.numChildren - 1; i >= 0; i--) {
 				var currentEffect:BaseEffect = BaseEffect(effectLayer.getChildAt(i));
-				if ((currentEffect.followee == currentSkeleton.leftHand) || (currentEffect.followee == currentSkeleton.rightHand)) {
+				if (currentEffect.followee == currentSkeleton.leftHand || currentEffect.followee == currentSkeleton.rightHand) {
 					effectLayer.removeChild(currentEffect);
 				}
 			}
 			
+			
 			currentSkeleton.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
-			currentSkeleton.removeEventListener(Mirror.SNAP_COMMAND_EVENT, onSnapCommandEvent);
-			return super.removeSkeletonDisplayer(index);
+			return currentSkeleton;
 		}
 		
 		private function getEffectByFollowee(followee:Hand):BaseEffect {

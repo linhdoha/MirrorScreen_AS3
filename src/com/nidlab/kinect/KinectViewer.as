@@ -1,8 +1,10 @@
 package com.nidlab.kinect 
 {
 	import flash.display.Sprite;
+	import flash.events.DataEvent;
 	import flash.events.Event;
 	import flash.geom.Point;
+	import flash.geom.Vector3D;
 	import flash.media.Camera;
 	import flash.media.Video;
 	import com.nidlab.kinect.BodyDataReader;
@@ -18,7 +20,7 @@ package com.nidlab.kinect
 		private var colorVideoHolder:Sprite;
 		private var skeletonHolder:Sprite;
 		private var _skeletonDisplayerList:Vector.<SkeletonDisplayer>;
-		private var _bodyData:BodyDataReader;
+		protected var _bodyDataReader:BodyDataReader;
 		private var _debugMode:Boolean = false;
 		
 		public function KinectViewer() 
@@ -42,13 +44,10 @@ package com.nidlab.kinect
 			skeletonHolder = new Sprite();
 			addChild(skeletonHolder);
 			
-			_bodyData = new BodyDataReader();
-			_bodyData.addEventListener(BodyDataReader.DATA_CHANGED, onDataChanged);
 		}
 		
 		protected function addSkeletonDisplayer(trackingID:Number, lHandState:Number, lHandPos:Point, lHandDepth:Number, rHandState:Number, rHandPos:Point, rHandDepth:Number):SkeletonDisplayer {
 			var skeletonDisplayerTemp:SkeletonDisplayer = new SkeletonDisplayer();
-			//skeletonDisplayerTemp.addEventListener(SkeletonDisplayer.SNAP_COMMAND_EVENT, onSnapCommandEvent);
 			skeletonDisplayerTemp.trackingID = trackingID;
 			
 			skeletonDisplayerTemp.leftHand.state = lHandState;
@@ -78,7 +77,6 @@ package com.nidlab.kinect
 					_skeletonDisplayerList[j].rightHand.state = rHandState;
 					_skeletonDisplayerList[j].rightHand.pos = rHandPos;
 					_skeletonDisplayerList[j].rightHand.depth = rHandDepth;
-					_skeletonDisplayerList[j].debugMode = _debugMode;
 					
 					skeletonDisplayerTemp = _skeletonDisplayerList[j];
 				}
@@ -86,16 +84,17 @@ package com.nidlab.kinect
 			return skeletonDisplayerTemp;
 		}
 		
-		protected function removeSkeletonDisplayer(index:int):SkeletonDisplayer {
-			var currentSkeletonDisplayer:SkeletonDisplayer = _skeletonDisplayerList[index];
-			skeletonHolder.removeChild(currentSkeletonDisplayer);
-			_skeletonDisplayerList[index] = null;
+		protected function removeSkeletonDisplayer(trackingID:Number):SkeletonDisplayer {
+			var currentSkeletonDisplayer:SkeletonDisplayer = null;
+			for (var i:int = 0; i < _skeletonDisplayerList.length; i++ ) {
+				if ((_skeletonDisplayerList[i] != null) && (trackingID == _skeletonDisplayerList[i].trackingID)) {
+					currentSkeletonDisplayer = _skeletonDisplayerList[i];
+					skeletonHolder.removeChild(currentSkeletonDisplayer);
+					_skeletonDisplayerList[i] = null;
+				}
+			}
 			
 			return currentSkeletonDisplayer;
-		}
-		
-		public function set bodyData(s:String):void {
-			_bodyData.data= s;
 		}
 		
 		public function get debugMode():Boolean 
@@ -122,39 +121,52 @@ package com.nidlab.kinect
 			_skeletonDisplayerList = value;
 		}
 		
-		private function onDataChanged(e:Event):void 
+		public function get bodyDataReader():BodyDataReader 
 		{
-			for (var i:int = 0; i < _bodyData.bodyCount; i++ ) {
-				if (_bodyData.getTrackingIDAt(i) != -1) {
-					var foundSkeletonDisplayer:Boolean = false;
-					//cập nhật dữ liệu
-					foundSkeletonDisplayer = (updateSkeletonDisplayer(_bodyData.getTrackingIDAt(i), _bodyData.getLeftHandStateAt(i), _bodyData.getLeftHandPosAt(i), _bodyData.getLeftHandDepthAt(i), _bodyData.getRightHandStateAt(i), _bodyData.getRightHandPosAt(i), _bodyData.getRightHandDepthAt(i)) != null);
-					
-					//nếu chưa tồn tại thì tạo mới
-					if (!foundSkeletonDisplayer) {
-						addSkeletonDisplayer(_bodyData.getTrackingIDAt(i), _bodyData.getLeftHandStateAt(i), _bodyData.getLeftHandPosAt(i), _bodyData.getLeftHandDepthAt(i), _bodyData.getRightHandStateAt(i), _bodyData.getRightHandPosAt(i), _bodyData.getRightHandDepthAt(i));
-					}
-				}
-			}
-			
-			//quét dọn tất cả những cái bị mất
-			for (var m:int = 0; m < _skeletonDisplayerList.length; m++ ) {
-				var foundOnBodyData:Boolean = false;
-				for (var n:int = 0; n < _bodyData.bodyCount; n++) {
-					if ((_skeletonDisplayerList[m] !=null) && (_skeletonDisplayerList[m].trackingID == _bodyData.getTrackingIDAt(n))) {
-						foundOnBodyData = true;
-					}
-				}
-				if ((!foundOnBodyData) && (_skeletonDisplayerList[m] !=null)) {
-					removeSkeletonDisplayer(m);
-				}
-			}
+			return _bodyDataReader;
 		}
 		
-		/*private function onSnapCommandEvent(e:Event):void 
+		public function set bodyDataReader(value:BodyDataReader):void 
 		{
-			dispatchEvent(new Event(SkeletonDisplayer.SNAP_COMMAND_EVENT));
-		}*/
+			_bodyDataReader = value;
+			_bodyDataReader.addEventListener(BodyDataReader.ON_BODY_ADDED, onBodyAdded);
+			_bodyDataReader.addEventListener(BodyDataReader.ON_BODY_UPDATED, onBodyUpdated);
+			_bodyDataReader.addEventListener(BodyDataReader.ON_BODY_REMOVED, onBodyRemoved);
+		}
+		
+		private function onBodyRemoved(e:DataEvent):void 
+		{
+			var trackingID:Number = Number(e.data);
+			removeSkeletonDisplayer(trackingID);
+		}
+		
+		private function onBodyUpdated(e:DataEvent):void 
+		{
+			var trackingID:Number = Number(e.data);
+			var leftHandState:Number = _bodyDataReader.getLeftHandStateAt(_bodyDataReader.getIndexByTrackingID(trackingID));
+			var leftHandPos:Point = _bodyDataReader.getJointsObjectMappedPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handleft");
+			var leftHand3DPos:Vector3D = _bodyDataReader.getJoint3DPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handleft");
+			
+			var rightHandState:Number = _bodyDataReader.getRightHandStateAt(_bodyDataReader.getIndexByTrackingID(trackingID));
+			var rightHandPos:Point = _bodyDataReader.getJointsObjectMappedPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handright");
+			var rightHand3DPos:Vector3D = _bodyDataReader.getJoint3DPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handright");
+			
+			updateSkeletonDisplayer(trackingID, leftHandState, leftHandPos, leftHand3DPos.z, rightHandState, rightHandPos, rightHand3DPos.z);
+		}
+		
+		private function onBodyAdded(e:DataEvent):void 
+		{
+			var trackingID:Number = Number(e.data);
+			var leftHandState:Number = _bodyDataReader.getLeftHandStateAt(_bodyDataReader.getIndexByTrackingID(trackingID));
+			var leftHandPos:Point = _bodyDataReader.getJointsObjectMappedPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handleft");
+			var leftHand3DPos:Vector3D = _bodyDataReader.getJoint3DPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handleft");
+			
+			var rightHandState:Number = _bodyDataReader.getRightHandStateAt(_bodyDataReader.getIndexByTrackingID(trackingID));
+			var rightHandPos:Point = _bodyDataReader.getJointsObjectMappedPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handright");
+			var rightHand3DPos:Vector3D = _bodyDataReader.getJoint3DPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handright");
+			
+			addSkeletonDisplayer(trackingID, leftHandState, leftHandPos, leftHand3DPos.z, rightHandState, rightHandPos, rightHand3DPos.z);
+		}
 	}
 
 }

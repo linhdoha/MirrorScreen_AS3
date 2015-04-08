@@ -1,5 +1,6 @@
 package mirrorScreen.themes
 {
+	import com.nidlab.kinect.BodyDataReader;
 	import flash.display.Sprite;
 	
 	/**
@@ -15,7 +16,7 @@ package mirrorScreen.themes
 		
 		}
 		
-		public function set bodyData(s:String):void
+		public function set bodyDataReader(value:BodyDataReader):void
 		{
 		
 		}

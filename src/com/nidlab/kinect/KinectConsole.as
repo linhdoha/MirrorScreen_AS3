@@ -16,7 +16,7 @@ package com.nidlab.kinect
 	{
 		private var process:NativeProcess;
 		public static const PROCESS_EXIT:String = "processExit";
-		public function KinectConsole(port:int=7001) 
+		public function KinectConsole(port:int=7001, debug:Boolean=false) 
 		{
 			//Kinect Server Console
 			if (NativeProcess.isSupported) {
@@ -26,6 +26,9 @@ package com.nidlab.kinect
 				
 				var processArgs:Vector.<String> = new Vector.<String>;
 				processArgs[0] = port;
+				if (debug) {
+					processArgs[1] = "-debug";
+				}
 				nativeProcessStartupInfo.arguments = processArgs;
 				
 				process = new NativeProcess();
@@ -48,12 +51,13 @@ package com.nidlab.kinect
 		
 		private function onStdErrorData(e:ProgressEvent):void 
 		{
-			trace("KinectConsole: ERROR -", process.standardError.readUTFBytes(process.standardError.bytesAvailable)); 
+			trace("KinectConsole: ERROR -" + process.standardError.readUTFBytes(process.standardError.bytesAvailable)); 
 		}
 		
 		private function onStdOut(e:ProgressEvent):void 
 		{
-			trace("KinectConsole: ", process.standardOutput.readUTFBytes(process.standardOutput.bytesAvailable));
+			//trace("KinectConsole: " + process.standardOutput.readUTFBytes(process.standardOutput.bytesAvailable));
+			var tempStr:String = process.standardOutput.readUTFBytes(process.standardOutput.bytesAvailable);
 		}
 		
 		public function get running():Boolean {

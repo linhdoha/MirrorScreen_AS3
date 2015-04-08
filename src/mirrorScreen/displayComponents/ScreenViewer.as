@@ -1,10 +1,14 @@
 package mirrorScreen.displayComponents
 {
+	import com.nidlab.kinect.BodyDataReader;
 	import com.nidlab.kinect.KinectV2Description;
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.geom.Rectangle;
 	import mirrorScreen.Configuration;
+	import mirrorScreen.themes.dustMirror.DustMirror;
 	import mirrorScreen.themes.fireMirror.FireMirror;
+	import mirrorScreen.themes.fireMirror.EffectMirror;
 	import mirrorScreen.themes.ThemeBase;
 	import mirrorScreen.themes.tripleMirror.TripleMirror;
 	
@@ -16,12 +20,13 @@ package mirrorScreen.displayComponents
 	{
 		public static const TRIPLE_MIRROR_THEME:String = "tripleMirror";
 		public static const FIRE_THEME:String = "fire";
+		public static const DUST_MIRROR_THEME:String = "dustMirror";
 		
 		private var appConfig:Configuration;
 		private var _theme:String = TRIPLE_MIRROR_THEME;
 		private var themeView:ThemeBase;
 		private var themeHolder:Sprite;
-		private var _bodyData:String;
+		private var _bodyDataReader:BodyDataReader;
 		
 		public function ScreenViewer()
 		{
@@ -61,7 +66,6 @@ package mirrorScreen.displayComponents
 		
 		private function applyTheme():void
 		{
-			trace("applyTheme");
 			if (themeView != null)
 			{
 				themeHolder.removeChild(themeView);
@@ -75,8 +79,15 @@ package mirrorScreen.displayComponents
 				case FIRE_THEME: 
 					themeView = new FireMirror();
 					break;
+				case DUST_MIRROR_THEME:
+					themeView = new DustMirror();
+					break;
 			}
-			themeView.bodyData = _bodyData;
+			
+			if (_bodyDataReader) {
+				themeView.bodyDataReader = _bodyDataReader;
+			}
+			
 			themeHolder.addChild(themeView);
 			redraw();
 		}
@@ -92,15 +103,18 @@ package mirrorScreen.displayComponents
 			applyTheme();
 		}
 		
-		public function get bodyData():String 
+		public function get bodyDataReader():BodyDataReader 
 		{
-			return _bodyData;
+			return _bodyDataReader;
 		}
 		
-		public function set bodyData(value:String):void 
+		public function set bodyDataReader(value:BodyDataReader):void 
 		{
-			_bodyData = value;
-			themeView.bodyData = _bodyData;
+			_bodyDataReader = value;
+			if (themeView) {
+				themeView.bodyDataReader = value;
+			}
+			
 		}
 	}
 

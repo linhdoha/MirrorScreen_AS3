@@ -1,6 +1,8 @@
 
 package mirrorScreen
 {
+	import com.nidlab.kinect.BodyDataReader;
+	import mirrorScreen.CommandDetector;
 	import com.nidlab.kinect.KinectConsole;
 	import com.nidlab.kinect.KinectSocket;
 	import com.nidlab.kinect.KinectV2Description;
@@ -14,21 +16,23 @@ package mirrorScreen
 	import mirrorScreen.Configuration;
 	import mirrorScreen.displayComponents.ScreenViewer;
 	import mirrorScreen.displayComponents.SnapShooter;
-	import mirrorScreen.themes.fireMirror.Mirror;
+	import mirrorScreen.themes.fireMirror.EffectMirror;
 	
 	/**
 	 * ...
 	 * @author Linhdoha
 	 */
-	public class Main extends Sprite
+	public class SelfieMirror extends Sprite
 	{
 		private var kinectSocket:KinectSocket;
 		private var screenViewer:ScreenViewer;
 		private var appConfig:Configuration;
 		private var snapShooter:SnapShooter;
 		private var kinectConsole:KinectConsole;
+		private var bodyDataReader:BodyDataReader;
+		private var commandDetector:CommandDetector;
 		
-		public function Main()
+		public function SelfieMirror()
 		{
 			if (stage)
 				init();
@@ -45,26 +49,31 @@ package mirrorScreen
 			stage.align = StageAlign.TOP_LEFT;
 			stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 			stage.addEventListener(Event.RESIZE, onStageResize);
-			//stage.addEventListener(FullScreenEvent.FULL_SCREEN, onStageResize);
 			stage.nativeWindow.addEventListener(Event.CLOSING, onAppClosing);
 			
 			appConfig = Configuration.getInstance();
 			
-			screenViewer = new ScreenViewer();
-			screenViewer.addEventListener(Mirror.SNAP_COMMAND_EVENT, onSnapCommandEvent);
-			screenViewer.mouseChildren = false;
-			screenViewer.doubleClickEnabled = true;
-			screenViewer.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
-			addChild(screenViewer);
+			bodyDataReader = new BodyDataReader();
 			
-			screenViewer.theme = ScreenViewer.FIRE_THEME;
+			kinectConsole = new KinectConsole(appConfig.kinectPort);
+			kinectConsole.addEventListener(KinectConsole.PROCESS_EXIT, onConsoleExit);
 			
 			kinectSocket = new KinectSocket(appConfig.kinectPort);
 			kinectSocket.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
 			kinectSocket.addEventListener(Event.CLOSE, onSocketClose);
 			
-			kinectConsole = new KinectConsole(appConfig.kinectPort);
-			kinectConsole.addEventListener(KinectConsole.PROCESS_EXIT, onConsoleExit);
+			commandDetector = new CommandDetector();
+			commandDetector.bodyDataReader = bodyDataReader;
+			commandDetector.addEventListener(CommandDetector.ON_SNAP_COMMAND, onSnapCommandEvent);
+			
+			screenViewer = new ScreenViewer();
+			screenViewer.mouseChildren = false;
+			screenViewer.doubleClickEnabled = true;
+			screenViewer.bodyDataReader = bodyDataReader;
+			screenViewer.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
+			addChild(screenViewer);
+			
+			screenViewer.theme = ScreenViewer.FIRE_THEME;
 			
 			snapShooter = new SnapShooter();
 			snapShooter.target = screenViewer;
@@ -73,6 +82,8 @@ package mirrorScreen
 			snapShooter.prenameOfImage = appConfig.prenameOfImage;
 			snapShooter.storageDir = appConfig.storageDir;
 			addChild(snapShooter);
+			
+			
 		}
 		
 		private function onStageResize(e:Event):void
@@ -138,7 +149,7 @@ package mirrorScreen
 		
 		private function onBodyDataEvent(e:Event):void
 		{
-			screenViewer.bodyData = kinectSocket.data;
+			bodyDataReader.data = kinectSocket.data;
 		}
 	}
 

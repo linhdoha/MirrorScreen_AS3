@@ -1,7 +1,9 @@
 package mirrorScreen.themes.fireMirror
 {
+	import com.nidlab.kinect.BodyDataReader;
+	import flash.events.Event;
 	import mirrorScreen.Configuration;
-	import mirrorScreen.themes.fireMirror.Mirror;
+	import mirrorScreen.themes.fireMirror.EffectMirror;
 	import mirrorScreen.themes.ThemeBase;
 	
 	/**
@@ -11,7 +13,7 @@ package mirrorScreen.themes.fireMirror
 	public class FireMirror extends ThemeBase
 	{
 		private var view:FireMirrorView;
-		private var mirror:Mirror;
+		private var mirror:EffectMirror;
 		
 		public function FireMirror()
 		{
@@ -19,8 +21,7 @@ package mirrorScreen.themes.fireMirror
 			view = new FireMirrorView();
 			addChild(view);
 			
-			mirror = new Mirror();
-			mirror.debugMode = true;
+			mirror = new EffectMirror();
 			view.main.addChild(mirror);
 			
 			mirror.height = Configuration.getInstance().themeHeight;
@@ -29,10 +30,10 @@ package mirrorScreen.themes.fireMirror
 			mirror.y = -mirror.height / 2;
 		}
 		
-		override public function set bodyData(value:String):void
+		override public function set bodyDataReader(value:BodyDataReader):void 
 		{
-			mirror.bodyData = value;
-			super.bodyData = value;
+			super.bodyDataReader = value;
+			mirror.bodyDataReader = value;
 		}
 	}
 

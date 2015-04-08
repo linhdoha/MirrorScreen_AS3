@@ -1,4 +1,4 @@
-package mirrorScreen.themes.tripleMirror 
+package mirrorScreen.themes.tripleMirror
 {
 	import com.nidlab.kinect.KinectCameraManager;
 	import com.nidlab.kinect.KinectV2Description;
@@ -13,14 +13,14 @@ package mirrorScreen.themes.tripleMirror
 	 * ...
 	 * @author Linhdoha
 	 */
-	public class TripleMirror extends ThemeBase 
+	public class TripleMirror extends ThemeBase
 	{
 		private var view:TripleMirrorView;
 		private var colorVideoL:Video;
 		private var colorVideoC:Video;
 		private var colorVideoR:Video;
 		
-		public function TripleMirror() 
+		public function TripleMirror()
 		{
 			super();
 			view = new TripleMirrorView();
@@ -28,7 +28,7 @@ package mirrorScreen.themes.tripleMirror
 			
 			//setup camera
 			var kinectCamera:Camera = KinectCameraManager.getInstance().getColorCamera();
-			kinectCamera.setMode(view.mirrorC.mirror.width, view.mirrorC.mirror.height,KinectV2Description.COLOR_CAMERA_FPS);
+			kinectCamera.setMode(view.mirrorC.mirror.width, view.mirrorC.mirror.height, KinectV2Description.COLOR_CAMERA_FPS);
 			
 			//attach camera to screen
 			colorVideoC = new Video(kinectCamera.width, kinectCamera.height);
@@ -46,16 +46,16 @@ package mirrorScreen.themes.tripleMirror
 			addEventListener(Event.ADDED_TO_STAGE, onAdded);
 		}
 		
-		private function onAdded(e:Event):void 
+		private function onAdded(e:Event):void
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, onAdded);
 			stage.addEventListener(Event.RESIZE, onStageResize);
 		}
 		
-		private function onStageResize(e:Event):void 
+		private function onStageResize(e:Event):void
 		{
 			var pp:PerspectiveProjection = new PerspectiveProjection();
-			pp.projectionCenter = new Point(0,0);
+			pp.projectionCenter = new Point(0, 0);
 			view.mirrorL.transform.perspectiveProjection = pp;
 			view.mirrorR.transform.perspectiveProjection = pp;
 		}

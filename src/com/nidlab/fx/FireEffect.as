@@ -26,7 +26,7 @@ package com.nidlab.fx
 		public override function draw():void {
 			super.draw();
 			if (isRunning) {
-				for(i=0;i<2;i++) {
+				for(i=0;i<1;i++) {
 					var s:FSprite = new FSprite();
 					s.alpha = Math.random()*0.5+0.5;
 					s.graphics.beginFill((Math.random()*0xffffff)&0x00FF00);

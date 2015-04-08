@@ -59,6 +59,7 @@
     <element path="lib\UltimateBlendModeShader.swc" />
     <element path="lib\TripleMirror.swc" />
     <element path="lib\FireMirror.swc" />
+    <element path="lib\DustMirror.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
@@ -78,7 +79,7 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\mirrorScreen\Main.as" />
+    <compile path="src\mirrorScreen\SelfieMirror.as" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
