@@ -20,12 +20,11 @@ package mirrorScreen.themes.fireMirror
 		{
 			super();
 			debugMode = true;
-			
 			effectLayer = new Sprite();
 			addChild(effectLayer);
 		}
 		
-		override protected function addSkeletonDisplayer(trackingID:Number, lHandState:Number, lHandPos:Point, lHandDepth:Number, rHandState:Number, rHandPos:Point, rHandDepth:Number):SkeletonDisplayer 
+		override protected function addSkeletonDisplayer(trackingID:Number, lHandState:int, lHandPos:Point, lHandDepth:Number, rHandState:int, rHandPos:Point, rHandDepth:Number):SkeletonDisplayer 
 		{
 			var currentSkeleton:SkeletonDisplayer = super.addSkeletonDisplayer(trackingID, lHandState, lHandPos, lHandDepth, rHandState, rHandPos, rHandDepth);
 			

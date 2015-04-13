@@ -1,5 +1,6 @@
 package com.nidlab.kinect 
 {
+	import com.nidlab.kinect.constant.Joints;
 	import flash.display.Sprite;
 	import flash.events.DataEvent;
 	import flash.events.Event;
@@ -43,10 +44,10 @@ package com.nidlab.kinect
 			_skeletonDisplayerList = new Vector.<SkeletonDisplayer>();
 			skeletonHolder = new Sprite();
 			addChild(skeletonHolder);
-			
+			skeletonHolder.visible = _debugMode;
 		}
 		
-		protected function addSkeletonDisplayer(trackingID:Number, lHandState:Number, lHandPos:Point, lHandDepth:Number, rHandState:Number, rHandPos:Point, rHandDepth:Number):SkeletonDisplayer {
+		protected function addSkeletonDisplayer(trackingID:Number, lHandState:int, lHandPos:Point, lHandDepth:Number, rHandState:int, rHandPos:Point, rHandDepth:Number):SkeletonDisplayer {
 			var skeletonDisplayerTemp:SkeletonDisplayer = new SkeletonDisplayer();
 			skeletonDisplayerTemp.trackingID = trackingID;
 			
@@ -58,7 +59,7 @@ package com.nidlab.kinect
 			skeletonDisplayerTemp.rightHand.pos = rHandPos;
 			skeletonDisplayerTemp.rightHand.depth = rHandDepth;
 			
-			skeletonDisplayerTemp.debugMode = _debugMode;
+			//skeletonDisplayerTemp.debugMode = _debugMode;
 			
 			_skeletonDisplayerList.push(skeletonDisplayerTemp);
 			skeletonHolder.addChild(skeletonDisplayerTemp);
@@ -66,7 +67,7 @@ package com.nidlab.kinect
 			return skeletonDisplayerTemp;
 		}
 		
-		protected function updateSkeletonDisplayer(trackingID:Number, lHandState:Number, lHandPos:Point, lHandDepth:Number, rHandState:Number, rHandPos:Point, rHandDepth:Number):SkeletonDisplayer {
+		protected function updateSkeletonDisplayer(trackingID:Number, lHandState:int, lHandPos:Point, lHandDepth:Number, rHandState:int, rHandPos:Point, rHandDepth:Number):SkeletonDisplayer {
 			var skeletonDisplayerTemp:SkeletonDisplayer = null;
 			for (var j:int = 0; j < _skeletonDisplayerList.length; j++) {
 				if ((_skeletonDisplayerList[j] != null) && (trackingID == _skeletonDisplayerList[j].trackingID)) {
@@ -106,9 +107,11 @@ package com.nidlab.kinect
 		{
 			_debugMode = value;
 			
-			for (var i:int = 0; i < _skeletonDisplayerList.length; i++ ) {
+			/*for (var i:int = 0; i < _skeletonDisplayerList.length; i++ ) {
 				_skeletonDisplayerList[i].debugMode = _debugMode;
-			}
+			}*/
+			
+			skeletonHolder.visible = _debugMode;
 		}
 		
 		public function get skeletonDisplayerList():Vector.<SkeletonDisplayer> 
@@ -134,36 +137,36 @@ package com.nidlab.kinect
 			_bodyDataReader.addEventListener(BodyDataReader.ON_BODY_REMOVED, onBodyRemoved);
 		}
 		
-		private function onBodyRemoved(e:DataEvent):void 
+		private function onBodyRemoved(e:BodyEvent):void 
 		{
-			var trackingID:Number = Number(e.data);
+			var trackingID:Number = e.trackingID;
 			removeSkeletonDisplayer(trackingID);
 		}
 		
-		private function onBodyUpdated(e:DataEvent):void 
+		private function onBodyUpdated(e:BodyEvent):void 
 		{
-			var trackingID:Number = Number(e.data);
-			var leftHandState:Number = _bodyDataReader.getLeftHandStateAt(_bodyDataReader.getIndexByTrackingID(trackingID));
-			var leftHandPos:Point = _bodyDataReader.getJointsObjectMappedPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handleft");
-			var leftHand3DPos:Vector3D = _bodyDataReader.getJoint3DPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handleft");
+			var trackingID:Number = e.trackingID;
+			var leftHandState:int = _bodyDataReader.getLeftHandState(trackingID);
+			var leftHandPos:Point = _bodyDataReader.getJointMappedPos(trackingID,Joints.HAND_LEFT);
+			var leftHand3DPos:Vector3D = _bodyDataReader.getJoint3DPos(trackingID,Joints.HAND_LEFT);
 			
-			var rightHandState:Number = _bodyDataReader.getRightHandStateAt(_bodyDataReader.getIndexByTrackingID(trackingID));
-			var rightHandPos:Point = _bodyDataReader.getJointsObjectMappedPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handright");
-			var rightHand3DPos:Vector3D = _bodyDataReader.getJoint3DPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handright");
+			var rightHandState:int = _bodyDataReader.getRightHandState(trackingID);
+			var rightHandPos:Point = _bodyDataReader.getJointMappedPos(trackingID,Joints.HAND_RIGHT);
+			var rightHand3DPos:Vector3D = _bodyDataReader.getJoint3DPos(trackingID,Joints.HAND_RIGHT);
 			
 			updateSkeletonDisplayer(trackingID, leftHandState, leftHandPos, leftHand3DPos.z, rightHandState, rightHandPos, rightHand3DPos.z);
 		}
 		
-		private function onBodyAdded(e:DataEvent):void 
+		private function onBodyAdded(e:BodyEvent):void 
 		{
-			var trackingID:Number = Number(e.data);
-			var leftHandState:Number = _bodyDataReader.getLeftHandStateAt(_bodyDataReader.getIndexByTrackingID(trackingID));
-			var leftHandPos:Point = _bodyDataReader.getJointsObjectMappedPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handleft");
-			var leftHand3DPos:Vector3D = _bodyDataReader.getJoint3DPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handleft");
+			var trackingID:Number = e.trackingID;
+			var leftHandState:int = _bodyDataReader.getLeftHandState(trackingID);
+			var leftHandPos:Point = _bodyDataReader.getJointMappedPos(trackingID,Joints.HAND_LEFT);
+			var leftHand3DPos:Vector3D = _bodyDataReader.getJoint3DPos(trackingID,Joints.HAND_LEFT);
 			
-			var rightHandState:Number = _bodyDataReader.getRightHandStateAt(_bodyDataReader.getIndexByTrackingID(trackingID));
-			var rightHandPos:Point = _bodyDataReader.getJointsObjectMappedPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handright");
-			var rightHand3DPos:Vector3D = _bodyDataReader.getJoint3DPosAt(_bodyDataReader.getIndexByTrackingID(trackingID),"handright");
+			var rightHandState:int = _bodyDataReader.getRightHandState(trackingID);
+			var rightHandPos:Point = _bodyDataReader.getJointMappedPos(trackingID,Joints.HAND_RIGHT);
+			var rightHand3DPos:Vector3D = _bodyDataReader.getJoint3DPos(trackingID,Joints.HAND_RIGHT);
 			
 			addSkeletonDisplayer(trackingID, leftHandState, leftHandPos, leftHand3DPos.z, rightHandState, rightHandPos, rightHand3DPos.z);
 		}

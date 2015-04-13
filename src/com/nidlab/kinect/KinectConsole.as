@@ -56,8 +56,8 @@ package com.nidlab.kinect
 		
 		private function onStdOut(e:ProgressEvent):void 
 		{
-			//trace("KinectConsole: " + process.standardOutput.readUTFBytes(process.standardOutput.bytesAvailable));
-			var tempStr:String = process.standardOutput.readUTFBytes(process.standardOutput.bytesAvailable);
+			trace("KinectConsole: " + process.standardOutput.readUTFBytes(process.standardOutput.bytesAvailable));
+			//var tempStr:String = process.standardOutput.readUTFBytes(process.standardOutput.bytesAvailable);
 		}
 		
 		public function get running():Boolean {

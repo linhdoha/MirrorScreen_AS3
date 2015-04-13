@@ -33,7 +33,7 @@ package mirrorScreen
 			
 			//snap command
 			for (var i:int = 0; i < _bodyDataReader.bodyCount; i++ ) {
-				if (_bodyDataReader.getLeftHandStateAt(i) == 4 && _bodyDataReader.getRightHandStateAt(i) == 4) {
+				if (_bodyDataReader.getLeftHandStateByIndex(i) == 4 && _bodyDataReader.getRightHandStateByIndex(i) == 4) {
 					dispatchEvent(new Event(ON_SNAP_COMMAND));
 					break;
 				}

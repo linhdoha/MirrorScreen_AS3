@@ -1,6 +1,9 @@
 package mirrorScreen.themes.dustMirror 
 {
 	import com.nidlab.kinect.BodyDataReader;
+	import com.nidlab.kinect.BodyEvent;
+	import com.nidlab.kinect.constant.HandStates;
+	import com.nidlab.kinect.constant.Joints;
 	import com.nidlab.kinect.KinectCameraManager;
 	import com.nidlab.kinect.KinectV2Description;
 	import flash.display.Sprite;
@@ -18,6 +21,9 @@ package mirrorScreen.themes.dustMirror
 	{
 		private var view:DustMirrorView;
 		private var _bodyDataReader:BodyDataReader;
+		//private var canvasList:Vector.<Canvas>;
+		private var canvasBodyMapper:Array = [];
+		private var rightHandIsWriting:Boolean = false;
 		
 		public function DustMirror() 
 		{
@@ -39,7 +45,6 @@ package mirrorScreen.themes.dustMirror
 			colorVideo2.width = view.mirror2.width;
 			colorVideo2.height = view.mirror2.height;
 			view.mirror2.addChild(colorVideo2);
-			
 		}
 		
 		override public function set bodyDataReader(value:BodyDataReader):void 
@@ -52,24 +57,46 @@ package mirrorScreen.themes.dustMirror
 			_bodyDataReader.addEventListener(BodyDataReader.ON_BODY_REMOVED, onBodyRemoved);
 		}
 		
-		private function onBodyRemoved(e:DataEvent):void 
-		{
-			trace(e.data + " REMOVED");
-		}
-		
-		private function onBodyUpdated(e:DataEvent):void 
-		{
-			trace(e.data + " UPDATED");
-		}
-		
-		private function onBodyAdded(e:DataEvent):void 
-		{
-			trace(e.data + " ADDED");
-		}
-		
 		private function onDataChanged(e:Event):void 
 		{
-			//_bodyDataReader.getJointsObjectMappedPosAt("handtipright",
+			
+		}
+		
+		private function onBodyRemoved(e:BodyEvent):void 
+		{
+			
+		}
+		
+		private function onBodyUpdated(e:BodyEvent):void 
+		{
+			/*if (_bodyDataReader.getRightHandState(e.trackingID) == HandStates.LASSO) {
+				if (!rightHandIsWriting) {
+					rightHandIsWriting = true;
+					
+					var canvasTemp:Canvas = new Canvas(e.trackingID, true);
+					addChild(canvasTemp);
+					
+					canvasBodyMapper.push(new { canvas:canvasTemp, trackingID:e.trackingID, handRight:true } );
+					
+				} else {
+					for each (var obj:Object in canvasBodyMapper) {
+						if (obj.trackingID) {
+							
+						}
+					}
+				}
+				
+				
+			} else if (rightHandIsWriting) {
+				
+			}*/
+			
+			
+			
+		}
+		
+		private function onBodyAdded(e:BodyEvent):void 
+		{
 			
 		}
 	}

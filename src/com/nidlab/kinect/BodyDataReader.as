@@ -1,6 +1,5 @@
 package com.nidlab.kinect
 {
-	import flash.events.DataEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.geom.Point;
@@ -26,6 +25,7 @@ package com.nidlab.kinect
 		
 		public function set data(s:String):void
 		{
+			trace(s);
 			var dataObject:Object;
 			try
 			{
@@ -58,7 +58,7 @@ package com.nidlab.kinect
 				{
 					for (var o:int = 0; o < bodyCount; o++)
 					{
-						dispatchEvent(new DataEvent(ON_BODY_ADDED, false, false, _bodyData.bodies[o].trackingID));
+						dispatchEvent(new BodyEvent(ON_BODY_ADDED, false, false, _bodyData.bodies[o].trackingID));
 					}
 				}
 				else
@@ -78,7 +78,7 @@ package com.nidlab.kinect
 						
 						if (!found)
 						{
-							dispatchEvent(new DataEvent(ON_BODY_ADDED, false, false, _bodyData.bodies[i].trackingID));
+							dispatchEvent(new BodyEvent(ON_BODY_ADDED, false, false, _bodyData.bodies[i].trackingID));
 						}
 					}
 					
@@ -96,18 +96,18 @@ package com.nidlab.kinect
 						
 						if (!found2)
 						{
-							dispatchEvent(new DataEvent(ON_BODY_REMOVED, false, false, _bodyDataOld.bodies[m].trackingID));
+							dispatchEvent(new BodyEvent(ON_BODY_REMOVED, false, false, _bodyDataOld.bodies[m].trackingID));
 						}
 						else
 						{
-							dispatchEvent(new DataEvent(ON_BODY_UPDATED, false, false, _bodyDataOld.bodies[m].trackingID));
+							dispatchEvent(new BodyEvent(ON_BODY_UPDATED, false, false, _bodyDataOld.bodies[m].trackingID));
 						}
 					}
 					
 				}
 			} else if (_bodyData.bodies.length == 0 && _bodyDataOld != null && _bodyDataOld.bodies.length !=0) {
 				for (var p:int = 0; p < _bodyDataOld.bodies.length; p++ ) {
-					dispatchEvent(new DataEvent(ON_BODY_REMOVED, false, false, _bodyDataOld.bodies[p].trackingID));
+					dispatchEvent(new BodyEvent(ON_BODY_REMOVED, false, false, _bodyDataOld.bodies[p].trackingID));
 				}
 			}
 		
@@ -129,8 +129,8 @@ package com.nidlab.kinect
 			return _trackingID;
 		}
 		
-		public function getIndexByTrackingID(trackingID:Number):Number {
-			var returnVal:Number = -1;
+		public function getIndexByTrackingID(trackingID:Number):int {
+			var returnVal:int = -1;
 			if (_bodyData) {
 				for (var i:int = 0; i < _bodyData.bodies.length; i++) {
 					if (trackingID == _bodyData.bodies[i].trackingID) {
@@ -141,9 +141,9 @@ package com.nidlab.kinect
 			return returnVal;
 		}
 		
-		public function getLeftHandStateAt(index:int):Number
+		public function getLeftHandStateByIndex(index:int):int
 		{
-			var returnVal:Number = -1;
+			var returnVal:int = -1;
 			if (_bodyData.bodies[index] != null)
 			{
 				returnVal = _bodyData.bodies[index].handLeftState;
@@ -151,9 +151,9 @@ package com.nidlab.kinect
 			return returnVal;
 		}
 		
-		public function getRightHandStateAt(index:int):Number
+		public function getRightHandStateByIndex(index:int):int
 		{
-			var returnVal:Number = -1;
+			var returnVal:int = -1;
 			if (_bodyData.bodies[index] != null)
 			{
 				returnVal = _bodyData.bodies[index].handRightState;
@@ -161,7 +161,15 @@ package com.nidlab.kinect
 			return returnVal;
 		}
 		
-		public function getJoint3DPosAt(index:int, name:String):Vector3D
+		public function getLeftHandState(trackingID:Number):int {
+			return getLeftHandStateByIndex(getIndexByTrackingID(trackingID));
+		}
+		
+		public function getRightHandState(trackingID:Number):int {
+			return getRightHandStateByIndex(getIndexByTrackingID(trackingID));
+		}
+		
+		public function getJoint3DPosByIndex(index:int, joint:String):Vector3D
 		{
 			var returnVal:Vector3D = new Vector3D();
 			
@@ -169,7 +177,7 @@ package com.nidlab.kinect
 			{
 				for (var i:int = 0; i < _bodyData.bodies[index].joints.length; i++)
 				{
-					if (_bodyData.bodies[index].joints[i].name == name)
+					if (_bodyData.bodies[index].joints[i].name == joint)
 					{
 						returnVal.x = _bodyData.bodies[index].joints[i].X;
 						returnVal.y = _bodyData.bodies[index].joints[i].Y;
@@ -181,7 +189,11 @@ package com.nidlab.kinect
 			return returnVal;
 		}
 		
-		public function getJointsObjectMappedPosAt(index:int, name:String):Point
+		public function getJoint3DPos(trackingID:Number, joint:String):Vector3D {
+			return getJoint3DPosByIndex(getIndexByTrackingID(trackingID),joint);
+		}
+		
+		public function getJointMappedPosByIndex(index:int, joint:String):Point
 		{
 			var returnVal:Point = new Point();
 			
@@ -189,7 +201,7 @@ package com.nidlab.kinect
 			{
 				for (var i:int = 0; i < _bodyData.bodies[index].joints.length; i++)
 				{
-					if (_bodyData.bodies[index].joints[i].name == name)
+					if (_bodyData.bodies[index].joints[i].name == joint)
 					{
 						returnVal.x = _bodyData.bodies[index].joints[i].mappedX;
 						returnVal.y = _bodyData.bodies[index].joints[i].mappedY;
@@ -198,6 +210,10 @@ package com.nidlab.kinect
 			}
 			
 			return returnVal;
+		}
+		
+		public function getJointMappedPos(trackingID:Number, joint:String):Point {
+			return getJointMappedPosByIndex(getIndexByTrackingID(trackingID), joint);
 		}
 	}
 

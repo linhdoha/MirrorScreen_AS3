@@ -9,7 +9,7 @@ package com.nidlab.kinect
 	 */
 	public class Hand extends Sprite
 	{
-		private var _state:Number;
+		private var _state:int;
 		private var _pos:Point;
 		private var _depth:Number;
 		
@@ -18,12 +18,12 @@ package com.nidlab.kinect
 			super();
 		}
 		
-		public function get state():Number
+		public function get state():int
 		{
 			return _state;
 		}
 		
-		public function set state(value:Number):void
+		public function set state(value:int):void
 		{
 			_state = value;
 		}

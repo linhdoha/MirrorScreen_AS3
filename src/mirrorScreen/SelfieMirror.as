@@ -16,6 +16,7 @@ package mirrorScreen
 	import mirrorScreen.Configuration;
 	import mirrorScreen.displayComponents.ScreenViewer;
 	import mirrorScreen.displayComponents.SnapShooter;
+	import mirrorScreen.themes.dustMirror.Canvas;
 	import mirrorScreen.themes.fireMirror.EffectMirror;
 	
 	/**
@@ -55,10 +56,12 @@ package mirrorScreen
 			
 			bodyDataReader = new BodyDataReader();
 			
-			kinectConsole = new KinectConsole(appConfig.kinectPort);
+			kinectConsole = new KinectConsole(appConfig.kinectPort,false);
 			kinectConsole.addEventListener(KinectConsole.PROCESS_EXIT, onConsoleExit);
 			
+			
 			kinectSocket = new KinectSocket(appConfig.kinectPort);
+			kinectSocket.gestureDatabaseFiles.push("database/HandGestures.gbd");
 			kinectSocket.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
 			kinectSocket.addEventListener(Event.CLOSE, onSocketClose);
 			
@@ -82,8 +85,6 @@ package mirrorScreen
 			snapShooter.prenameOfImage = appConfig.prenameOfImage;
 			snapShooter.storageDir = appConfig.storageDir;
 			addChild(snapShooter);
-			
-			
 		}
 		
 		private function onStageResize(e:Event):void
