@@ -2,12 +2,8 @@ package mirrorScreen.themes.dustMirror
 {
 	import com.nidlab.kinect.BodyDataReader;
 	import com.nidlab.kinect.BodyEvent;
-	import com.nidlab.kinect.constant.HandStates;
-	import com.nidlab.kinect.constant.Joints;
 	import com.nidlab.kinect.KinectCameraManager;
 	import com.nidlab.kinect.KinectV2Description;
-	import flash.display.Sprite;
-	import flash.events.DataEvent;
 	import flash.events.Event;
 	import flash.media.Camera;
 	import flash.media.Video;

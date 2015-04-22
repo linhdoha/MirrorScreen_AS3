@@ -15,6 +15,7 @@ package com.nidlab.kinect
 		public static const ON_BODY_ADDED:String = "onBodyAdded";
 		public static const ON_BODY_UPDATED:String = "onBodyUpdated";
 		public static const ON_BODY_REMOVED:String = "onBodyRemoved";
+		public static const ON_GESTURE_EVENT:String = "onGestureEvent";
 		private var _bodyData:*;
 		private var _bodyDataOld:*;
 		
@@ -25,10 +26,9 @@ package com.nidlab.kinect
 		
 		public function set data(s:String):void
 		{
-			trace(s);
 			var dataObject:Object;
-			try
-			{
+			//try
+			//{
 				dataObject = JSON.parse(s);
 				if (dataObject.command == "bodyData")
 				{
@@ -42,23 +42,34 @@ package com.nidlab.kinect
 				{
 					trace("Wrong BodyData: " + dataObject.command);
 				}
-			}
-			catch (e:Error)
-			{
-				trace(e.message);
-				trace(s);
-			}
+			//}
+			//catch (e:Error)
+			//{
+				//trace(e.message);
+				//trace(s);
+			//}
 		}
 		
 		private function processData():void
 		{
-			if (_bodyData.bodies.length != 0)
+			checkGesture();
+			checkNewBody();
+			checkUpdateBody();
+			checkRemoveBody();
+			
+			/*if (_bodyData.bodies.length > 0)
 			{
+				for each (var body:Object in _bodyData.bodies) {
+					for each (var gesture:Object in body.gesture) {
+						trace("GESTURE: " + gesture.name+" progress: " + gesture.progress);
+					}
+				}
+				
+				// nếu trước đó không có dữ liệu gì thì _bodyData toàn là người mới
 				if (_bodyDataOld == null || _bodyDataOld.bodies.length == 0)
 				{
-					for (var o:int = 0; o < bodyCount; o++)
-					{
-						dispatchEvent(new BodyEvent(ON_BODY_ADDED, false, false, _bodyData.bodies[o].trackingID));
+					for each (var body2:Object in _bodyData.bodies) {
+						dispatchEvent(new BodyEvent(ON_BODY_ADDED, false, false, body2.trackingID));
 					}
 				}
 				else
@@ -109,13 +120,75 @@ package com.nidlab.kinect
 				for (var p:int = 0; p < _bodyDataOld.bodies.length; p++ ) {
 					dispatchEvent(new BodyEvent(ON_BODY_REMOVED, false, false, _bodyDataOld.bodies[p].trackingID));
 				}
-			}
+			}*/
 		
 		}
 		
 		public function get bodyCount():int
 		{
 			return int(_bodyData.bodies.length);
+		}
+		
+		private function checkGesture():void {
+			if (_bodyData.bodies.length > 0) {
+				for each (var body:Object in _bodyData.bodies) {
+					if (body.gesture.length > 0) {
+						trace("AAAAAAAAAAAAAAAAAAAAA");
+					}
+					for each (var gesture:Object in body.gesture) {
+						trace("GESTURE: " + gesture.name+" progress: " + gesture.progress);
+					}
+				}
+			}
+		}
+		
+		private function checkNewBody():void {
+			if (_bodyData.bodies.length > 0) {
+				if (_bodyDataOld == null || _bodyDataOld.bodies.length == 0) {
+					for each (var bodyInNew:Object in _bodyData.bodies) {
+						dispatchEvent(new BodyEvent(ON_BODY_ADDED, false, false, bodyInNew.trackingID));
+					}
+				} else {
+					for each (var bodyInNew2:Object in _bodyData.bodies) {
+						var found:Boolean = false;
+						for each (var bodyInOld2:Object in _bodyDataOld.bodies) {
+							if (bodyInNew2.trackingID == bodyInOld2.trackingID) found = true;
+						}
+						
+						if (!found) dispatchEvent(new BodyEvent(ON_BODY_ADDED, false, false, bodyInNew2.trackingID));
+					}
+				}
+			}
+		}
+		
+		private function checkUpdateBody():void {
+			if (_bodyData.bodies.length > 0 && _bodyDataOld.bodies.length > 0) {
+				for each (var bodyInNew:Object in _bodyData.bodies) {
+					for each (var bodyInOld:Object in _bodyDataOld.bodies) {
+						if (bodyInNew.trackingID == bodyInOld.trackingID) {
+							dispatchEvent(new BodyEvent(ON_BODY_UPDATED, false, false, bodyInOld.trackingID));
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		private function checkRemoveBody():void {
+			if (_bodyData.bodies.length == 0 && _bodyDataOld != null && _bodyDataOld.bodies.length >0) {
+				for each (var bodyInOld:Object in _bodyDataOld.bodies) {
+					dispatchEvent(new BodyEvent(ON_BODY_REMOVED, false, false, bodyInOld.trackingID));
+				}
+			} else if (_bodyData.bodies.length > 0 && _bodyDataOld.bodies.length > 0) {
+				for each (var bodyInOld2:Object in _bodyDataOld.bodies) {
+					var found:Boolean = false;
+					for each (var bodyInNew:Object in _bodyData.bodies) {
+						if (bodyInOld2.trackingID == bodyInNew.trackingID) found = true;
+					}
+					
+					if (!found) dispatchEvent(new BodyEvent(ON_BODY_REMOVED, false, false, bodyInOld2.trackingID));
+				}
+			}
 		}
 		
 		public function getTrackingIDAt(index:int):Number

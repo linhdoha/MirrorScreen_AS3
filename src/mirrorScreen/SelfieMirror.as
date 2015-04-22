@@ -2,10 +2,8 @@
 package mirrorScreen
 {
 	import com.nidlab.kinect.BodyDataReader;
-	import mirrorScreen.CommandDetector;
 	import com.nidlab.kinect.KinectConsole;
 	import com.nidlab.kinect.KinectSocket;
-	import com.nidlab.kinect.KinectV2Description;
 	import flash.desktop.NativeApplication;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -13,11 +11,10 @@ package mirrorScreen
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import mirrorScreen.CommandDetector;
 	import mirrorScreen.Configuration;
 	import mirrorScreen.displayComponents.ScreenViewer;
 	import mirrorScreen.displayComponents.SnapShooter;
-	import mirrorScreen.themes.dustMirror.Canvas;
-	import mirrorScreen.themes.fireMirror.EffectMirror;
 	
 	/**
 	 * ...
@@ -62,6 +59,9 @@ package mirrorScreen
 			
 			kinectSocket = new KinectSocket(appConfig.kinectPort);
 			kinectSocket.gestureDatabaseFiles.push("database/HandGestures.gbd");
+			kinectSocket.gestureDatabaseFiles.push("database/TakeSnap.gba");
+			//kinectSocket.gestureDatabaseFiles.push("database/Seated.gba");
+			
 			kinectSocket.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
 			kinectSocket.addEventListener(Event.CLOSE, onSocketClose);
 			
