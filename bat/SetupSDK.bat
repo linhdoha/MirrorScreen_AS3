@@ -1,7 +1,7 @@
 :user_configuration
 
 :: Path to Flex SDK
-set FLEX_SDK=E:\Downloads\Compressed\AIRSDK_Compiler
+set FLEX_SDK=F:\Downloads\Compressed\AIRSDK_Compiler
 
 
 :validation

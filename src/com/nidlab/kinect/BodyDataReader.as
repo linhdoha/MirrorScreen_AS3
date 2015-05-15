@@ -132,11 +132,12 @@ package com.nidlab.kinect
 		private function checkGesture():void {
 			if (_bodyData.bodies.length > 0) {
 				for each (var body:Object in _bodyData.bodies) {
-					if (body.gesture.length > 0) {
-						trace("AAAAAAAAAAAAAAAAAAAAA");
-					}
 					for each (var gesture:Object in body.gesture) {
-						trace("GESTURE: " + gesture.name+" progress: " + gesture.progress);
+						if (Number(gesture.progress) >= 0.8) {
+							trace("GESTURE: " + gesture.name+" progress: " + gesture.progress);
+							dispatchEvent(new GestureEvent(gesture.name, false, false, gesture.progress));
+						}
+						
 					}
 				}
 			}

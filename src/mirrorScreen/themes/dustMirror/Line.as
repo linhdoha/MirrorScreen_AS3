@@ -14,42 +14,14 @@ package mirrorScreen.themes.dustMirror
 	{
 		private var pts:Array = new Array();
 		private var canvas:Sprite;
+		private var _handPointer:HandPointer;
+		private var _isCompleted:Boolean = false;
+		private var _size:int = 10;
 		public function Line() 
 		{
 			super();
-			//addEventListener(Event.ADDED_TO_STAGE, onAdded);
 			canvas = this;
 		}
-		
-		/*private function onAdded(e:Event):void 
-		{
-			removeEventListener(Event.ADDED_TO_STAGE, onAdded);
-			
-			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-		}
-		
-		private function onMouseDown(e:MouseEvent):void 
-		{
-			
-			var anchor:Point = new Point(mouseX, mouseY);
-			pts.push(anchor);
-			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-			
-		}
-		
-		private function onMouseUp(e:MouseEvent):void 
-		{
-			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-			stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-		}
-		
-		private function onMouseMove(e:MouseEvent):void 
-		{
-			var anchor:Point = new Point(mouseX, mouseY);
-			pts.push(anchor);
-			draw();
-		}*/
 		
 		public function addPoint(point:Point):void {
 			pts.push(point);
@@ -80,7 +52,7 @@ package mirrorScreen.themes.dustMirror
 				//g.lineTo(midpt.x-Math.cos(a+Math.PI/2)*8,midpt.y-Math.sin(a+Math.PI/2)*8);
 				
 				// draw the curves:
-				g.lineStyle(2,0x66FFFF,1);
+				g.lineStyle(_size,0x66FFFF,1);
 				if (prevMidpt) {
 					g.moveTo(prevMidpt.x,prevMidpt.y);
 					g.curveTo(pt1.x,pt1.y,midpt.x,midpt.y);
@@ -93,6 +65,36 @@ package mirrorScreen.themes.dustMirror
 			}
 			// draw end segment:
 			g.lineTo(pt2.x,pt2.y);
+		}
+		
+		public function get handPointer():HandPointer 
+		{
+			return _handPointer;
+		}
+		
+		public function set handPointer(value:HandPointer):void 
+		{
+			_handPointer = value;
+		}
+		
+		public function get isCompleted():Boolean 
+		{
+			return _isCompleted;
+		}
+		
+		public function set isCompleted(value:Boolean):void 
+		{
+			_isCompleted = value;
+		}
+		
+		public function get size():int 
+		{
+			return _size;
+		}
+		
+		public function set size(value:int):void 
+		{
+			_size = value;
 		}
 	}
 

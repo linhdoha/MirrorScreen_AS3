@@ -31,13 +31,13 @@ package mirrorScreen
 		private function onDataChange(e:Event):void 
 		{
 			
-			//snap command
+			/*//snap command
 			for (var i:int = 0; i < _bodyDataReader.bodyCount; i++ ) {
 				if (_bodyDataReader.getLeftHandStateByIndex(i) == 4 && _bodyDataReader.getRightHandStateByIndex(i) == 4) {
 					dispatchEvent(new Event(ON_SNAP_COMMAND));
 					break;
 				}
-			}
+			}*/
 			
 			
 		}

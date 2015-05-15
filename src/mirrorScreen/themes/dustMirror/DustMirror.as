@@ -2,11 +2,17 @@ package mirrorScreen.themes.dustMirror
 {
 	import com.nidlab.kinect.BodyDataReader;
 	import com.nidlab.kinect.BodyEvent;
+	import com.nidlab.kinect.constant.HandStates;
+	import com.nidlab.kinect.constant.Joints;
 	import com.nidlab.kinect.KinectCameraManager;
 	import com.nidlab.kinect.KinectV2Description;
 	import flash.events.Event;
+	import flash.filters.BlurFilter;
+	import flash.geom.Point;
 	import flash.media.Camera;
 	import flash.media.Video;
+	import flash.utils.Dictionary;
+	import mirrorScreen.Configuration;
 	import mirrorScreen.themes.ThemeBase;
 	
 	/**
@@ -17,9 +23,8 @@ package mirrorScreen.themes.dustMirror
 	{
 		private var view:DustMirrorView;
 		private var _bodyDataReader:BodyDataReader;
-		//private var canvasList:Vector.<Canvas>;
-		private var canvasBodyMapper:Array = [];
-		private var rightHandIsWriting:Boolean = false;
+		private var canvas:Canvas;
+		private var handPointers:Vector.<HandPointer> = new Vector.<HandPointer>;
 		
 		public function DustMirror() 
 		{
@@ -28,19 +33,36 @@ package mirrorScreen.themes.dustMirror
 			addChild(view);
 			
 			var kinectCamera:Camera = KinectCameraManager.getInstance().getColorCamera();
-			kinectCamera.setMode(607, 1080, KinectV2Description.COLOR_CAMERA_FPS);
+			kinectCamera.setMode(KinectV2Description.COLOR_CAMERA_WIDTH, KinectV2Description.COLOR_CAMERA_HEIGHT, KinectV2Description.COLOR_CAMERA_FPS);
 			
 			var colorVideo:Video = new Video(kinectCamera.width, kinectCamera.height);
 			colorVideo.attachCamera(kinectCamera);
-			colorVideo.width = view.mirror.width;
-			colorVideo.height = view.mirror.height;
+			colorVideo.height = Configuration.getInstance().themeHeight;
+			colorVideo.scaleX = colorVideo.scaleY;
+			colorVideo.x = -colorVideo.width / 2;
+			colorVideo.y = -colorVideo.height / 2;
 			view.mirror.addChild(colorVideo);
 			
 			var colorVideo2:Video = new Video(kinectCamera.width, kinectCamera.height);
 			colorVideo2.attachCamera(kinectCamera);
-			colorVideo2.width = view.mirror2.width;
-			colorVideo2.height = view.mirror2.height;
+			colorVideo2.height = Configuration.getInstance().themeHeight;
+			colorVideo2.scaleX = colorVideo2.scaleY;
+			colorVideo2.x = -colorVideo2.width / 2;
+			colorVideo2.y = -colorVideo2.height / 2;
 			view.mirror2.addChild(colorVideo2);
+			
+			canvas = new Canvas();
+			canvas.height = Configuration.getInstance().themeHeight;
+			canvas.scaleX = canvas.scaleY;
+			canvas.x = -canvas.width / 2;
+			canvas.y = -canvas.height / 2;
+			view.addChild(canvas);
+			
+			canvas.cacheAsBitmap = true;
+			canvas.filters = [new BlurFilter(0,0,1)];
+			
+			view.mirror2.cacheAsBitmap = true;
+			view.mirror2.mask = canvas;
 		}
 		
 		override public function set bodyDataReader(value:BodyDataReader):void 
@@ -65,35 +87,58 @@ package mirrorScreen.themes.dustMirror
 		
 		private function onBodyUpdated(e:BodyEvent):void 
 		{
-			/*if (_bodyDataReader.getRightHandState(e.trackingID) == HandStates.LASSO) {
-				if (!rightHandIsWriting) {
-					rightHandIsWriting = true;
-					
-					var canvasTemp:Canvas = new Canvas(e.trackingID, true);
-					addChild(canvasTemp);
-					
-					canvasBodyMapper.push(new { canvas:canvasTemp, trackingID:e.trackingID, handRight:true } );
-					
-				} else {
-					for each (var obj:Object in canvasBodyMapper) {
-						if (obj.trackingID) {
-							
+			for each(var handPointerTemp:HandPointer in handPointers) {
+				if (handPointerTemp.bodyId == e.trackingID) {
+					if (handPointerTemp.hand) {
+						if (_bodyDataReader.getRightHandState(handPointerTemp.bodyId) == HandStates.LASSO && isRightHandRaising(handPointerTemp.bodyId)) {
+							handPointerTemp.isDrawing = true;
+							handPointerTemp.pressure = 10;
+						} else if (_bodyDataReader.getRightHandState(handPointerTemp.bodyId) == HandStates.OPEN && isRightHandRaising(handPointerTemp.bodyId)) {
+							handPointerTemp.pressure = 40;
+							handPointerTemp.isDrawing = true;
+						} else if (_bodyDataReader.getRightHandState(handPointerTemp.bodyId) == HandStates.CLOSED || !isRightHandRaising(handPointerTemp.bodyId)) {
+							handPointerTemp.isDrawing = false;
+							canvas.release(handPointerTemp);
+						}
+					} else {
+						if (_bodyDataReader.getLeftHandState(handPointerTemp.bodyId) == HandStates.LASSO && isLeftHandRaising(handPointerTemp.bodyId)) {
+							handPointerTemp.isDrawing = true;
+							handPointerTemp.pressure = 10;
+						} else if (_bodyDataReader.getLeftHandState(handPointerTemp.bodyId) == HandStates.OPEN && isLeftHandRaising(handPointerTemp.bodyId)) {
+							handPointerTemp.pressure = 40;
+							handPointerTemp.isDrawing = true;
+						} else if (_bodyDataReader.getLeftHandState(handPointerTemp.bodyId) == HandStates.CLOSED || !isLeftHandRaising(handPointerTemp.bodyId)) {
+							handPointerTemp.isDrawing = false;
+							canvas.release(handPointerTemp);
 						}
 					}
+					
+					if (handPointerTemp.isDrawing) {
+						if (handPointerTemp.hand) {
+							canvas.interact(handPointerTemp, _bodyDataReader.getJointMappedPos(e.trackingID, Joints.HAND_TIP_RIGHT),handPointerTemp.pressure);
+						} else {
+							canvas.interact(handPointerTemp, _bodyDataReader.getJointMappedPos(e.trackingID, Joints.HAND_TIP_LEFT),handPointerTemp.pressure);
+						}
+						
+					}
 				}
-				
-				
-			} else if (rightHandIsWriting) {
-				
-			}*/
-			
-			
-			
+			}
 		}
 		
 		private function onBodyAdded(e:BodyEvent):void 
 		{
-			
+			handPointers.push(new HandPointer(e.trackingID,true));
+			handPointers.push(new HandPointer(e.trackingID,false));
+		}
+		
+		private function isLeftHandRaising(trackingID:Number):Boolean {
+			//return _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_LEFT).y >= _bodyDataReader.getJoint3DPos(trackingID, Joints.ELBOW_LEFT).y;
+			return _bodyDataReader.getJoint3DPos(trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_LEFT).z >= 0.2 ;
+		}
+		
+		private function isRightHandRaising(trackingID:Number):Boolean {
+			//return _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_RIGHT).y >= _bodyDataReader.getJoint3DPos(trackingID, Joints.ELBOW_RIGHT).y;
+			return _bodyDataReader.getJoint3DPos(trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_RIGHT).z >= 0.2 ;
 		}
 	}
 
