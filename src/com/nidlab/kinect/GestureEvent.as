@@ -8,11 +8,15 @@ package com.nidlab.kinect
 	 */
 	public class GestureEvent extends Event 
 	{
+		private var _trackingID:Number;
+		private var _gestureName:String;
 		private var _progress:Number;
 		
-		public function GestureEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false, progress:Number=0) 
+		public function GestureEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false, trackingID:Number = -1, gestureName:String="", progress:Number=0) 
 		{ 
 			super(type, bubbles, cancelable);
+			_trackingID = trackingID;
+			_gestureName = gestureName;
 			_progress = progress;
 		} 
 		
@@ -29,6 +33,16 @@ package com.nidlab.kinect
 		public function get progress():Number 
 		{
 			return _progress;
+		}
+		
+		public function get gestureName():String 
+		{
+			return _gestureName;
+		}
+		
+		public function get trackingID():Number 
+		{
+			return _trackingID;
 		}
 		
 	}

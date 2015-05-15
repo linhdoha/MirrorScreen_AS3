@@ -133,11 +133,7 @@ package com.nidlab.kinect
 			if (_bodyData.bodies.length > 0) {
 				for each (var body:Object in _bodyData.bodies) {
 					for each (var gesture:Object in body.gesture) {
-						if (Number(gesture.progress) >= 0.8) {
-							trace("GESTURE: " + gesture.name+" progress: " + gesture.progress);
-							dispatchEvent(new GestureEvent(gesture.name, false, false, gesture.progress));
-						}
-						
+						dispatchEvent(new GestureEvent(ON_GESTURE_EVENT, false, false, body.trackingID, gesture.name, gesture.progress));
 					}
 				}
 			}
@@ -163,7 +159,7 @@ package com.nidlab.kinect
 		}
 		
 		private function checkUpdateBody():void {
-			if (_bodyData.bodies.length > 0 && _bodyDataOld.bodies.length > 0) {
+			if (_bodyData.bodies.length > 0 && _bodyDataOld && _bodyDataOld.bodies.length > 0) {
 				for each (var bodyInNew:Object in _bodyData.bodies) {
 					for each (var bodyInOld:Object in _bodyDataOld.bodies) {
 						if (bodyInNew.trackingID == bodyInOld.trackingID) {
@@ -180,7 +176,7 @@ package com.nidlab.kinect
 				for each (var bodyInOld:Object in _bodyDataOld.bodies) {
 					dispatchEvent(new BodyEvent(ON_BODY_REMOVED, false, false, bodyInOld.trackingID));
 				}
-			} else if (_bodyData.bodies.length > 0 && _bodyDataOld.bodies.length > 0) {
+			} else if (_bodyData.bodies.length > 0 && _bodyDataOld != null && _bodyDataOld.bodies.length > 0) {
 				for each (var bodyInOld2:Object in _bodyDataOld.bodies) {
 					var found:Boolean = false;
 					for each (var bodyInNew:Object in _bodyData.bodies) {

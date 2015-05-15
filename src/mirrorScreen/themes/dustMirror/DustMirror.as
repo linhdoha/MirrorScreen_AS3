@@ -133,12 +133,12 @@ package mirrorScreen.themes.dustMirror
 		
 		private function isLeftHandRaising(trackingID:Number):Boolean {
 			//return _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_LEFT).y >= _bodyDataReader.getJoint3DPos(trackingID, Joints.ELBOW_LEFT).y;
-			return _bodyDataReader.getJoint3DPos(trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_LEFT).z >= 0.2 ;
+			return true;//_bodyDataReader.getJoint3DPos(trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_LEFT).z >= 0.2 ;
 		}
 		
 		private function isRightHandRaising(trackingID:Number):Boolean {
 			//return _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_RIGHT).y >= _bodyDataReader.getJoint3DPos(trackingID, Joints.ELBOW_RIGHT).y;
-			return _bodyDataReader.getJoint3DPos(trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_RIGHT).z >= 0.2 ;
+			return true;// _bodyDataReader.getJoint3DPos(trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(trackingID, Joints.WRIST_RIGHT).z >= 0.2 ;
 		}
 	}
 

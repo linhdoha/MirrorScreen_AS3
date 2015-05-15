@@ -1,6 +1,8 @@
 package mirrorScreen 
 {
 	import com.nidlab.kinect.BodyDataReader;
+	import com.nidlab.kinect.constant.Joints;
+	import com.nidlab.kinect.GestureEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	/**
@@ -26,6 +28,28 @@ package mirrorScreen
 		{
 			_bodyDataReader = value;
 			_bodyDataReader.addEventListener(BodyDataReader.DATA_CHANGED, onDataChange);
+			_bodyDataReader.addEventListener(BodyDataReader.ON_GESTURE_EVENT, onGestureEvent);
+		}
+		
+		private function onGestureEvent(e:GestureEvent):void 
+		{
+			//trace("Gesture: " + e.gestureName +" progress: " + e.progress);
+			switch (e.gestureName) {
+				case "TakeSnap":
+					var leftHandOverHead:Boolean = _bodyDataReader.getJoint3DPos(e.trackingID, Joints.HEAD).y < _bodyDataReader.getJoint3DPos(e.trackingID, Joints.THUMB_LEFT).y ;
+					var rightHandOverHead:Boolean = _bodyDataReader.getJoint3DPos(e.trackingID, Joints.HEAD).y < _bodyDataReader.getJoint3DPos(e.trackingID, Joints.THUMB_RIGHT).y ;
+					var leftHandRaising:Boolean = _bodyDataReader.getJoint3DPos(e.trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(e.trackingID, Joints.WRIST_LEFT).z >= 0.2 ;
+					var rightHandRaising:Boolean = _bodyDataReader.getJoint3DPos(e.trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(e.trackingID, Joints.WRIST_RIGHT).z >= 0.2 ;
+					
+					if (!leftHandOverHead && !rightHandOverHead && leftHandRaising && rightHandRaising) {
+						dispatchEvent(new Event(ON_SNAP_COMMAND));
+					}
+					break;
+				
+				case "WaveHand":
+					
+					break;
+			}
 		}
 		
 		private function onDataChange(e:Event):void 

@@ -53,24 +53,20 @@ package mirrorScreen
 			appConfig = Configuration.getInstance();
 			
 			bodyDataReader = new BodyDataReader();
-			bodyDataReader.addEventListener("Wave_Left", onWaveLeft);
-			bodyDataReader.addEventListener("Take_Photo", onTakeSnap);
 			
 			kinectConsole = new KinectConsole(appConfig.kinectPort,false);
 			kinectConsole.addEventListener(KinectConsole.PROCESS_EXIT, onConsoleExit);
 			
-			
 			kinectSocket = new KinectSocket(appConfig.kinectPort);
-			//kinectSocket.gestureDatabaseFiles.push("database/TakeSnap.gba");
-			//kinectSocket.gestureDatabaseFiles.push("database/HandGestures.gbd");
-			//kinectSocket.gestureDatabaseFiles.push("database/Seated.gba");
+			kinectSocket.gestureDatabaseFiles.push("database/TakeSnap.gba");
+			kinectSocket.gestureDatabaseFiles.push("database/WaveHand.gba");
 			
 			kinectSocket.addEventListener(KinectSocket.BODY_DATA_EVENT, onBodyDataEvent);
 			kinectSocket.addEventListener(Event.CLOSE, onSocketClose);
 			
-			/*commandDetector = new CommandDetector();
+			commandDetector = new CommandDetector();
 			commandDetector.bodyDataReader = bodyDataReader;
-			commandDetector.addEventListener(CommandDetector.ON_SNAP_COMMAND, onSnapCommandEvent);*/
+			commandDetector.addEventListener(CommandDetector.ON_SNAP_COMMAND, onSnapCommandEvent);
 			
 			screenViewer = new ScreenViewer();
 			screenViewer.mouseChildren = false;
@@ -88,16 +84,6 @@ package mirrorScreen
 			snapShooter.prenameOfImage = appConfig.prenameOfImage;
 			snapShooter.storageDir = appConfig.storageDir;
 			addChild(snapShooter);
-		}
-		
-		private function onTakeSnap(e:GestureEvent):void 
-		{
-			snapShooter.startCount();
-		}
-		
-		private function onWaveLeft(e:GestureEvent):void 
-		{
-			
 		}
 		
 		private function onStageResize(e:Event):void
@@ -156,10 +142,10 @@ package mirrorScreen
 			}
 		}
 		
-		/*private function onSnapCommandEvent(e:Event):void
+		private function onSnapCommandEvent(e:Event):void
 		{
 			snapShooter.startCount();
-		}*/
+		}
 		
 		private function onBodyDataEvent(e:Event):void
 		{
