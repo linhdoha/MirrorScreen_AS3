@@ -33,7 +33,7 @@ package mirrorScreen
 		
 		private function onGestureEvent(e:GestureEvent):void 
 		{
-			//trace("Gesture: " + e.gestureName +" progress: " + e.progress);
+			trace("Gesture: " + e.gestureName +" progress: " + e.progress);
 			switch (e.gestureName) {
 				case "TakeSnap":
 					var leftHandOverHead:Boolean = _bodyDataReader.getJoint3DPos(e.trackingID, Joints.HEAD).y < _bodyDataReader.getJoint3DPos(e.trackingID, Joints.THUMB_LEFT).y ;
@@ -42,12 +42,12 @@ package mirrorScreen
 					var rightHandRaising:Boolean = _bodyDataReader.getJoint3DPos(e.trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(e.trackingID, Joints.WRIST_RIGHT).z >= 0.2 ;
 					
 					if (!leftHandOverHead && !rightHandOverHead && leftHandRaising && rightHandRaising) {
-						dispatchEvent(new Event(ON_SNAP_COMMAND));
+						//dispatchEvent(new Event(ON_SNAP_COMMAND));
 					}
 					break;
 				
 				case "WaveHand":
-					
+					dispatchEvent(new Event(ON_SNAP_COMMAND));
 					break;
 			}
 		}

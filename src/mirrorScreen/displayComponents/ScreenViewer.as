@@ -9,6 +9,7 @@ package mirrorScreen.displayComponents
 	import mirrorScreen.themes.dustMirror.DustMirror;
 	import mirrorScreen.themes.fireMirror.FireMirror;
 	import mirrorScreen.themes.fireMirror.EffectMirror;
+	import mirrorScreen.themes.LEMirror.LEMirror;
 	import mirrorScreen.themes.ThemeBase;
 	import mirrorScreen.themes.tripleMirror.TripleMirror;
 	
@@ -21,6 +22,7 @@ package mirrorScreen.displayComponents
 		public static const TRIPLE_MIRROR_THEME:String = "tripleMirror";
 		public static const FIRE_THEME:String = "fire";
 		public static const DUST_MIRROR_THEME:String = "dustMirror";
+		public static const LE_MIRROR_THEME:String = "LEMirror";
 		
 		private var appConfig:Configuration;
 		private var _theme:String = TRIPLE_MIRROR_THEME;
@@ -81,6 +83,9 @@ package mirrorScreen.displayComponents
 					break;
 				case DUST_MIRROR_THEME:
 					themeView = new DustMirror();
+					break;
+				case LE_MIRROR_THEME:
+					themeView = new LEMirror();
 					break;
 			}
 			

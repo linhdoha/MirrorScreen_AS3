@@ -60,6 +60,7 @@
     <element path="lib\TripleMirror.swc" />
     <element path="lib\FireMirror.swc" />
     <element path="lib\DustMirror.swc" />
+    <element path="lib\LongExposure.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
@@ -91,7 +92,7 @@
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
-    <option showHiddenPaths="True" />
+    <option showHiddenPaths="False" />
     <option testMovie="Custom" />
     <option testMovieCommand="Run.bat" />
   </options>
