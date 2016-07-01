@@ -19,7 +19,7 @@ package mirrorScreen.themes.fireMirror
 		public function EffectMirror() 
 		{
 			super();
-			debugMode = false;
+			debugMode = true;
 			effectLayer = new Sprite();
 			addChild(effectLayer);
 		}

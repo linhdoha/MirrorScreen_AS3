@@ -36,6 +36,8 @@ package com.nidlab.kinect
 			kinectCamera.setMode(KinectV2Description.COLOR_CAMERA_WIDTH, KinectV2Description.COLOR_CAMERA_HEIGHT, KinectV2Description.COLOR_CAMERA_FPS);
 			colorVideo = new Video(kinectCamera.width,kinectCamera.height);
 			colorVideo.attachCamera(kinectCamera);
+			colorVideo.scaleX = -colorVideo.scaleX;
+			colorVideo.x = colorVideo.width;
 			
 			colorVideoHolder = new Sprite();
 			colorVideoHolder.addChild(colorVideo);

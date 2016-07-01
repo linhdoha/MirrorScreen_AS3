@@ -42,7 +42,7 @@ package mirrorScreen
 					var rightHandRaising:Boolean = _bodyDataReader.getJoint3DPos(e.trackingID, Joints.SPINE_MID).z - _bodyDataReader.getJoint3DPos(e.trackingID, Joints.WRIST_RIGHT).z >= 0.2 ;
 					
 					if (!leftHandOverHead && !rightHandOverHead && leftHandRaising && rightHandRaising) {
-						//dispatchEvent(new Event(ON_SNAP_COMMAND));
+						dispatchEvent(new Event(ON_SNAP_COMMAND));
 					}
 					break;
 				

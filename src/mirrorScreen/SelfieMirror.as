@@ -75,7 +75,7 @@ package mirrorScreen
 			screenViewer.addEventListener(MouseEvent.DOUBLE_CLICK, onDoubleClick);
 			addChild(screenViewer);
 			
-			screenViewer.theme = ScreenViewer.DUST_MIRROR_THEME;
+			screenViewer.theme = ScreenViewer.FIRE_THEME;
 			
 			snapShooter = new SnapShooter();
 			snapShooter.target = screenViewer;

@@ -38,7 +38,8 @@ package mirrorScreen.themes.LEMirror
 			colorVideo.attachCamera(kinectCamera);
 			colorVideo.height = Configuration.getInstance().themeHeight;
 			colorVideo.scaleX = colorVideo.scaleY;
-			colorVideo.x = -colorVideo.width / 2;
+			colorVideo.scaleX = -colorVideo.scaleX;
+			colorVideo.x = colorVideo.width / 2;
 			colorVideo.y = -colorVideo.height / 2;
 			view.mirror.addChild(colorVideo);
 			

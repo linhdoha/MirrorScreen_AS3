@@ -39,7 +39,8 @@ package mirrorScreen.themes.dustMirror
 			colorVideo.attachCamera(kinectCamera);
 			colorVideo.height = Configuration.getInstance().themeHeight;
 			colorVideo.scaleX = colorVideo.scaleY;
-			colorVideo.x = -colorVideo.width / 2;
+			colorVideo.scaleX = -colorVideo.scaleX;
+			colorVideo.x = colorVideo.width / 2;
 			colorVideo.y = -colorVideo.height / 2;
 			view.mirror.addChild(colorVideo);
 			
@@ -47,7 +48,8 @@ package mirrorScreen.themes.dustMirror
 			colorVideo2.attachCamera(kinectCamera);
 			colorVideo2.height = Configuration.getInstance().themeHeight;
 			colorVideo2.scaleX = colorVideo2.scaleY;
-			colorVideo2.x = -colorVideo2.width / 2;
+			colorVideo2.scaleX = -colorVideo2.scaleX;
+			colorVideo2.x = colorVideo2.width / 2;
 			colorVideo2.y = -colorVideo2.height / 2;
 			view.mirror2.addChild(colorVideo2);
 			

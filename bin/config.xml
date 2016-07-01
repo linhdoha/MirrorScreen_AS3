@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
-	<storageDir path="E:\Google Drive\Photos\MirrorSnaps" />
+	<storageDir path="D:\" />
 	<imageFile prename="Mirror_" type="PNG" quality="80" />
 	<theme width="1000" height="1778" />
 	<kinect port="7001" />

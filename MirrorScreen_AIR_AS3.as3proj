@@ -8,11 +8,11 @@
     <movie fps="30" />
     <movie width="1920" />
     <movie height="1080" />
-    <movie version="16" />
+    <movie version="21" />
     <movie minorVersion="0" />
     <movie platform="AIR" />
     <movie background="#FFFFFF" />
-    <movie preferredSDK="AIR 16.0.0;16.0.0;" />
+    <movie preferredSDK="AIR 22.0.0;22.0.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>

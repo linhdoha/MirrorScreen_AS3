@@ -1,7 +1,7 @@
 :user_configuration
 
 :: Path to Flex SDK
-set FLEX_SDK=F:\Downloads\Compressed\AIRSDK_Compiler
+set FLEX_SDK=C:\Users\Linhdoha\AppData\Local\FlashDevelop\Apps\ascsdk\22.0.0
 
 
 :validation

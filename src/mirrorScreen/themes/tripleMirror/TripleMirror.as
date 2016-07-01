@@ -34,14 +34,20 @@ package mirrorScreen.themes.tripleMirror
 			colorVideoC = new Video(kinectCamera.width, kinectCamera.height);
 			colorVideoC.attachCamera(kinectCamera);
 			view.mirrorC.mirror.addChild(colorVideoC);
+			colorVideoC.scaleX = -colorVideoC.scaleX;
+			colorVideoC.x = colorVideoC.width;
 			
 			colorVideoL = new Video(kinectCamera.width, kinectCamera.height);
 			colorVideoL.attachCamera(kinectCamera);
 			view.mirrorL.mirror.addChild(colorVideoL);
+			colorVideoL.scaleX = -colorVideoL.scaleX;
+			colorVideoL.x = colorVideoL.width;
 			
 			colorVideoR = new Video(kinectCamera.width, kinectCamera.height);
 			colorVideoR.attachCamera(kinectCamera);
 			view.mirrorR.mirror.addChild(colorVideoR);
+			colorVideoR.scaleX = -colorVideoR.scaleX;
+			colorVideoR.x = colorVideoR.width;
 			
 			addEventListener(Event.ADDED_TO_STAGE, onAdded);
 		}
