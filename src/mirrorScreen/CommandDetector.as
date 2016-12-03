@@ -28,7 +28,7 @@ package mirrorScreen
 		{
 			_bodyDataReader = value;
 			_bodyDataReader.addEventListener(BodyDataReader.DATA_CHANGED, onDataChange);
-			_bodyDataReader.addEventListener(BodyDataReader.ON_GESTURE_EVENT, onGestureEvent);
+			_bodyDataReader.addEventListener(BodyDataReader.ON_GESTURE_END, onGestureEvent);
 		}
 		
 		private function onGestureEvent(e:GestureEvent):void 

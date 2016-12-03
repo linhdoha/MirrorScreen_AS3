@@ -18,6 +18,7 @@
   <classpaths>
     <class path="src" />
     <class path="..\libs" />
+    <class path="..\NIDLibs\NIDLibs" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -61,6 +62,7 @@
     <element path="lib\FireMirror.swc" />
     <element path="lib\DustMirror.swc" />
     <element path="lib\LongExposure.swc" />
+    <element path="lib\framework.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

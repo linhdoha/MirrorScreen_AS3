@@ -54,7 +54,7 @@ package mirrorScreen
 			
 			bodyDataReader = new BodyDataReader();
 			
-			kinectConsole = new KinectConsole(appConfig.kinectPort,false);
+			kinectConsole = new KinectConsole(appConfig.kinectPort,true);
 			kinectConsole.addEventListener(KinectConsole.PROCESS_EXIT, onConsoleExit);
 			
 			kinectSocket = new KinectSocket(appConfig.kinectPort);
